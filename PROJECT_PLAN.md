@@ -11,7 +11,7 @@ Status: **Completed and debug APK verified.** Physical-device tap-through remain
 
 ## Milestone 2 - Offline attendance engine
 
-Status: **Completed with 18 passing JVM tests across attendance, session, and login behavior.**
+Status: **Completed with 25 passing JVM tests across attendance, session, persistence, login, and formatting behavior.**
 
 - Add `PresenceSource` and `SimulatedPresenceSource`.
 - Validate active session and enrollment before accepting an event.
@@ -36,7 +36,7 @@ Status: **Completed as a clearly labeled local-only demo.** Firebase synchroniza
 
 ## Milestone 5 - QA and submission pack
 
-Status: **Build, unit tests, lint, JavaScript parsing, and documentation completed.** Emulator/phone launch is not verified because the available AVD remained offline and no phone was attached.
+Status: **Build, 25 Android JVM tests, 3 teacher-dashboard tests, lint, JavaScript parsing, and documentation completed.** Emulator/phone launch is not verified because the available AVD remained offline and no phone was attached.
 
 - Run unit tests and debug assembly.
 - Record actual PASS/FAIL/NOT RUN outcomes.

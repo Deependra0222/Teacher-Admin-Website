@@ -21,14 +21,16 @@ As checked on 2026-10-10, the official Android setup documentation lists Firebas
 |---|---|---|
 | `users` | `name`, `email`, `rollNumber`, `department`, `batch`, `role` | Trusted admin |
 | `subjects` | `code`, `name`, `teacherIds` | Teacher/admin |
-| `enrollments` | `studentId`, `subjectId`, `batch`, `active` | Teacher/admin |
+| `enrollments` | Document ID `${studentId}_${subjectId}`; fields `studentId`, `subjectId`, `batch`, `active` | Teacher/admin |
 | `timetable` | `subjectId`, `batch`, `room`, `startTime`, `endTime` | Teacher/admin |
 | `sessions` | `subjectId`, `teacherId`, `batch`, `room`, `startAt`, `endAt`, `status` | Authorized teacher |
 | `presenceEvents` | `studentId`, `sessionId`, `type`, `occurredAt`, `source`, `simulated` | Student evidence only |
 | `attendance` | `studentId`, `sessionId`, `confirmedSeconds`, `percentage`, `status`, `late`, `finalizedBy` | Authorized teacher |
-| `auditLogs` | `actorId`, `attendanceId`, `before`, `after`, `reason`, `createdAt` | Authorized teacher |
+| `auditLogs` | `actorId`, `attendanceId`, `sessionId`, `beforeStatus`, `afterStatus`, `reason`, `createdAt` | Authorized teacher |
 
 Store timestamps as UTC Firestore timestamps. Convert to Asia/Kolkata only for display. Student evidence is untrusted input; finalized attendance must remain teacher-controlled.
+
+Attendance corrections must use one Firestore transaction or atomic batch. Generate an audit ID, update the attendance document with `auditLogId` and the corrected `status`, and create `auditLogs/{auditLogId}` with the same attendance/session IDs, the previous and new status, the teacher's UID, a reason of at least five characters, and a server timestamp. The included rules reject a correction if its matching audit record is absent.
 
 ## Verification checklist
 

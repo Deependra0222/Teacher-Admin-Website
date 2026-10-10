@@ -148,6 +148,37 @@ class AttendanceTrackerTest {
         assertEquals(Duration.ZERO, tracker.snapshot().confirmed)
     }
 
+    @Test
+    fun outOfOrderReentryIsRejectedWithoutDoubleCounting() {
+        val clock = FakeClock(start)
+        val tracker = AttendanceTracker(student, session, clock)
+        tracker.record(PresenceSignal(PresenceSignalType.ENTER, start))
+        tracker.record(PresenceSignal(PresenceSignalType.EXIT, start.plus(Duration.ofMinutes(30))))
+
+        val backwardEntry = tracker.record(
+            PresenceSignal(PresenceSignalType.ENTER, start.plus(Duration.ofMinutes(15))),
+        )
+
+        assertFalse(backwardEntry.accepted)
+        assertEquals(Duration.ofMinutes(30), tracker.snapshot().confirmed)
+        assertFalse(tracker.snapshot().inside)
+    }
+
+    @Test
+    fun exitBeforeItsEntryIsRejectedWithoutClosingInterval() {
+        val clock = FakeClock(start.plus(Duration.ofMinutes(20)))
+        val tracker = AttendanceTracker(student, session, clock)
+        tracker.record(PresenceSignal(PresenceSignalType.ENTER, clock.now()))
+
+        val backwardExit = tracker.record(
+            PresenceSignal(PresenceSignalType.EXIT, start.plus(Duration.ofMinutes(10))),
+        )
+
+        assertFalse(backwardExit.accepted)
+        assertTrue(tracker.snapshot().inside)
+        assertEquals(Duration.ZERO, tracker.snapshot().confirmed)
+    }
+
     private class FakeClock(var current: Instant) : AppClock {
         override fun now(): Instant = current
     }

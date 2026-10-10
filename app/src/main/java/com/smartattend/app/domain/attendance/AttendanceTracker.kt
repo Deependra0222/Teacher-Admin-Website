@@ -15,6 +15,7 @@ data class PresenceSnapshot(
     val openSince: Instant? = null,
     val confirmed: Duration = Duration.ZERO,
     val firstEntry: Instant? = null,
+    val lastEventAt: Instant? = null,
 )
 
 data class TrackingOutcome(
@@ -68,6 +69,7 @@ class AttendanceTracker(
         student.batch != session.batch -> "Student is not enrolled in this session batch"
         session.status != SessionStatus.ACTIVE -> "Session is not active"
         at.isBefore(session.start) || !at.isBefore(session.end) -> "Event is outside the active session"
+        state.lastEventAt?.let(at::isBefore) == true -> "Event time is earlier than the last accepted event"
         else -> null
     }
 
@@ -77,6 +79,7 @@ class AttendanceTracker(
             inside = true,
             openSince = at,
             firstEntry = state.firstEntry ?: at,
+            lastEventAt = at,
         )
         return accepted("Demo classroom entry recorded")
     }
@@ -88,6 +91,7 @@ class AttendanceTracker(
             inside = false,
             openSince = null,
             confirmed = state.confirmed.plus(elapsed),
+            lastEventAt = at,
         )
         return accepted("Demo classroom exit recorded")
     }

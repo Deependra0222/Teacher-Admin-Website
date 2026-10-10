@@ -43,6 +43,7 @@ fun HomeScreen(
     onFinish: () -> Unit,
 ) {
     val eligible = sessionState == SessionDisplayState.ACTIVE_ELIGIBLE
+    val canCalculate = eligible || inside || confirmedMinutes > 0
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
@@ -72,7 +73,7 @@ fun HomeScreen(
                         Button(onClick = onEnter, enabled = eligible && !inside, modifier = Modifier.weight(1f)) { Text("Enter") }
                         OutlinedButton(onClick = onExit, enabled = eligible && inside, modifier = Modifier.weight(1f)) { Text("Exit") }
                     }
-                    OutlinedButton(onClick = onFinish, enabled = eligible, modifier = Modifier.fillMaxWidth()) { Text("Calculate demo result") }
+                    OutlinedButton(onClick = onFinish, enabled = canCalculate, modifier = Modifier.fillMaxWidth()) { Text("Calculate demo result") }
                 }
             }
         }

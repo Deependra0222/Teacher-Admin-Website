@@ -20,7 +20,6 @@ import com.smartattend.app.domain.presence.SimulatedPresenceSource
 import com.smartattend.app.domain.presence.SystemAppClock
 import com.smartattend.app.domain.session.SessionAvailability
 import com.smartattend.app.domain.session.SessionDisplayState
-import java.time.Instant
 
 enum class AppDestination(val label: String, val shortLabel: String) {
     HOME("Home", "H"),
@@ -52,16 +51,29 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
     private val preferences = DemoPreferences(application)
     private val clock = SystemAppClock
     private val source = SimulatedPresenceSource(clock)
-    private val storedSession = preferences.loadOrCreateSession(clock.now())
-    private val session = repository.activeSession(storedSession.start, storedSession.end)
+    private val startupNow = clock.now()
+    private val storedSession = preferences.loadOrCreateSession(startupNow)
+    private val session = repository.activeSession(storedSession.start, storedSession.end, startupNow)
+    private val initialSnapshot = preferences.loadPresence()
     private val tracker = AttendanceTracker(
         student = repository.student,
         session = session,
         clock = clock,
-        initialSnapshot = preferences.loadPresence(),
+        initialSnapshot = initialSnapshot,
     )
+    private val restoredResult = preferences.loadResult() ?: if (
+        !startupNow.isBefore(session.end) &&
+        (initialSnapshot.inside || initialSnapshot.confirmed.toMillis() > 0L)
+    ) {
+        tracker.finish().also {
+            preferences.savePresence(tracker.snapshot())
+            preferences.saveResult(it)
+        }
+    } else {
+        null
+    }
 
-    var uiState by mutableStateOf(buildState(isLoggedIn = preferences.isLoggedIn))
+    var uiState by mutableStateOf(buildState(isLoggedIn = preferences.isLoggedIn).copy(finalResult = restoredResult))
         private set
 
     fun login(identifier: String, password: String) {
@@ -90,6 +102,7 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
     fun finishDemoSession() {
         val result = tracker.finish()
         preferences.savePresence(tracker.snapshot())
+        preferences.saveResult(result)
         uiState = buildState(isLoggedIn = true).copy(
             finalResult = result,
             message = "Demo result calculated locally; teacher verification is still required",
@@ -112,7 +125,7 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
             isLoggedIn = isLoggedIn,
             student = repository.student,
             session = session,
-            sessionState = SessionAvailability.determine(repository.student, session, Instant.now()),
+            sessionState = SessionAvailability.determine(repository.student, session, clock.now()),
             timetable = repository.timetable(session),
             subjects = repository.subjectAttendance,
             history = repository.history,

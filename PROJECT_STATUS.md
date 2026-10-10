@@ -11,6 +11,7 @@
 - Implemented local persistence, active-session/enrollment validation, `PresenceSource`, `SimulatedPresenceSource`, and tested attendance calculation.
 - Added Firestore data documentation and deny-by-default rules without adding credentials.
 - Added a local teacher dashboard with session controls, evidence/final tables, correction audit, and CSV export.
+- Applied an independent review hardening pass: rejected backward timestamps, retained unfinalized expired evidence, persisted completed results and dashboard corrections, escaped audit HTML, labeled CSV exports as simulation-only, and tightened Firestore validation/audit requirements.
 - Added README, test report, demo script, viva notes, Gradle helper, and generated a debug APK.
 
 ## Current task
@@ -20,16 +21,19 @@
 ## Tests run
 
 - `gradlew tasks --all`: PASS under project-local Temurin JDK 17.
-- `gradlew testDebugUnitTest`: PASS, 18 tests, 0 failures, 0 errors.
+- `gradlew testDebugUnitTest`: PASS, 25 tests across 6 suites, 0 failures, 0 errors.
 - `gradlew assembleDebug`: PASS; generated `app/build/outputs/apk/debug/app-debug.apk`.
 - `gradlew lintDebug`: PASS with 0 errors and 8 version/target recommendations documented in `TEST_REPORT.md`.
-- `node --check teacher-dashboard/app.js`: PASS.
+- `node --test teacher-dashboard/dashboard-model.test.js`: PASS, 3 tests, 0 failures.
+- `node --check teacher-dashboard/app.js` and `dashboard-model.js`: PASS.
+- `git diff --check`: PASS (line-ending conversion notices only; no whitespace errors).
 - Android emulator launch: NOT RUN successfully; installed API 36 AVD remained offline and was stopped after diagnostics.
 
 ## Known issues / blockers
 
 - `java`, `javac`, and `gradle` are not on the system `PATH`; use `build-smartattend.bat` or set Android Studio's Gradle JDK to the included project-local JDK 17.
 - No `google-services.json` or Firebase project credentials exist; cloud authentication/sync cannot be verified.
+- Firebase CLI/Emulator Suite is not installed, so the hardened Firestore rules have not been emulator-tested or deployed.
 - No ESP32 hardware is available; BLE attendance cannot be implemented or verified honestly.
 - No physical phone was attached; the available AVD did not come online, so installation and visual tap-through remain unverified.
 - Teacher dashboard and Android data are intentionally not synchronized until Firebase is configured.

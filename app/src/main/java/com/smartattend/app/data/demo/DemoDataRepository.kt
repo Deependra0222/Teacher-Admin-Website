@@ -24,7 +24,7 @@ class DemoDataRepository(
         batch = "CSE-2026-A",
     )
 
-    fun activeSession(start: Instant, end: Instant) = ClassSession(
+    fun activeSession(start: Instant, end: Instant, now: Instant = Instant.now()) = ClassSession(
         id = "session-os-demo",
         subjectId = "cs301",
         subjectName = "Operating Systems",
@@ -33,7 +33,7 @@ class DemoDataRepository(
         start = start,
         end = end,
         gracePeriod = Duration.ofMinutes(10),
-        status = SessionStatus.ACTIVE,
+        status = if (now.isBefore(end)) SessionStatus.ACTIVE else SessionStatus.ENDED,
     )
 
     fun timetable(session: ClassSession): List<TimetableItem> = listOf(

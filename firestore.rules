@@ -18,6 +18,44 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == studentId;
     }
 
+    function teacherOwnsSession(sessionId) {
+      return isTeacher() &&
+        get(/databases/$(database)/documents/sessions/$(sessionId)).data.teacherId == request.auth.uid;
+    }
+
+    function validPresenceEvent() {
+      let sessionDoc = get(
+        /databases/$(database)/documents/sessions/$(request.resource.data.sessionId)
+      );
+      let enrollmentDoc = get(
+        /databases/$(database)/documents/enrollments/$(
+          request.auth.uid + "_" + sessionDoc.data.subjectId
+        )
+      );
+      return request.resource.data.keys().hasAll([
+          "studentId", "sessionId", "type", "occurredAt", "source", "simulated"
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          "studentId", "sessionId", "type", "occurredAt", "source", "simulated"
+        ]) &&
+        request.resource.data.studentId == request.auth.uid &&
+        request.resource.data.sessionId is string &&
+        request.resource.data.type in ["enter", "exit"] &&
+        request.resource.data.occurredAt is timestamp &&
+        request.resource.data.source in ["simulation", "ble"] &&
+        request.resource.data.simulated is bool &&
+        sessionDoc.data.status == "active" &&
+        sessionDoc.data.batch == userRecord().data.batch &&
+        request.resource.data.occurredAt >= sessionDoc.data.startAt &&
+        request.resource.data.occurredAt <= sessionDoc.data.endAt &&
+        request.time >= sessionDoc.data.startAt &&
+        request.time <= sessionDoc.data.endAt &&
+        enrollmentDoc.data.studentId == request.auth.uid &&
+        enrollmentDoc.data.subjectId == sessionDoc.data.subjectId &&
+        enrollmentDoc.data.batch == sessionDoc.data.batch &&
+        enrollmentDoc.data.active == true;
+    }
+
     match /users/{userId} {
       allow read: if ownsStudentData(userId) || isTeacher();
       // Roles and profiles are bootstrapped by a trusted administrator only.
@@ -42,35 +80,59 @@ service cloud.firestore {
 
     match /sessions/{sessionId} {
       allow read: if signedIn();
-      allow create, update: if isTeacher() &&
+      allow create: if isTeacher() &&
         request.resource.data.teacherId == request.auth.uid;
+      allow update: if isTeacher() &&
+        resource.data.teacherId == request.auth.uid &&
+        request.resource.data.teacherId == resource.data.teacherId;
       allow delete: if false;
     }
 
     match /presenceEvents/{eventId} {
       allow read: if isTeacher() ||
         (signedIn() && resource.data.studentId == request.auth.uid);
-      allow create: if signedIn() &&
-        request.resource.data.studentId == request.auth.uid &&
-        request.resource.data.keys().hasOnly([
-          "studentId", "sessionId", "type", "occurredAt", "source", "simulated"
-        ]) &&
-        request.resource.data.source in ["simulation", "ble"] &&
-        request.resource.data.simulated is bool;
+      allow create: if signedIn() && validPresenceEvent();
       allow update, delete: if false;
     }
 
     match /attendance/{attendanceId} {
       allow read: if isTeacher() ||
         (signedIn() && resource.data.studentId == request.auth.uid);
-      allow create, update: if isTeacher();
+      allow create: if teacherOwnsSession(request.resource.data.sessionId) &&
+        request.resource.data.studentId is string &&
+        request.resource.data.status in ["Present", "Late", "Review", "Absent"];
+      allow update: if teacherOwnsSession(resource.data.sessionId) &&
+        request.resource.data.sessionId == resource.data.sessionId &&
+        request.resource.data.studentId == resource.data.studentId &&
+        request.resource.data.auditLogId is string &&
+        (!resource.data.keys().hasAny(["auditLogId"]) ||
+          request.resource.data.auditLogId != resource.data.auditLogId) &&
+        getAfter(
+          /databases/$(database)/documents/auditLogs/$(request.resource.data.auditLogId)
+        ).data.attendanceId == attendanceId &&
+        getAfter(
+          /databases/$(database)/documents/auditLogs/$(request.resource.data.auditLogId)
+        ).data.actorId == request.auth.uid &&
+        getAfter(
+          /databases/$(database)/documents/auditLogs/$(request.resource.data.auditLogId)
+        ).data.beforeStatus == resource.data.status &&
+        getAfter(
+          /databases/$(database)/documents/auditLogs/$(request.resource.data.auditLogId)
+        ).data.afterStatus == request.resource.data.status &&
+        getAfter(
+          /databases/$(database)/documents/auditLogs/$(request.resource.data.auditLogId)
+        ).data.createdAt == request.time;
       allow delete: if false;
     }
 
     match /auditLogs/{logId} {
       allow read: if isTeacher();
-      allow create: if isTeacher() &&
+      allow create: if teacherOwnsSession(request.resource.data.sessionId) &&
+        request.resource.data.keys().hasAll([
+          "actorId", "attendanceId", "sessionId", "beforeStatus", "afterStatus", "reason", "createdAt"
+        ]) &&
         request.resource.data.actorId == request.auth.uid &&
+        request.resource.data.createdAt == request.time &&
         request.resource.data.reason is string &&
         request.resource.data.reason.size() >= 5;
       allow update, delete: if false;

@@ -1,10 +1,14 @@
 "use strict";
 
-const students = [
+const defaultStudents = [
   { id: "CS-042", name: "Aarav Sharma", percentage: 82, status: "Present" },
   { id: "CS-055", name: "Diya Patel", percentage: 67, status: "Review" },
   { id: "CS-061", name: "Kabir Singh", percentage: 43, status: "Absent" },
 ];
+let students = DashboardModel.restoreStudents(
+  localStorage.getItem("smartattend-demo-students"),
+  defaultStudents,
+);
 const evidence = [
   { student: "Aarav Sharma", event: "Enter", time: "10:02 AM", source: "Simulation" },
   { student: "Diya Patel", event: "Enter", time: "10:12 AM", source: "Simulation" },
@@ -20,9 +24,9 @@ function render() {
   byId("session-status").textContent = sessionActive ? "Active (demo)" : "Not started";
   byId("start-button").disabled = sessionActive;
   byId("stop-button").disabled = !sessionActive;
-  byId("evidence-body").innerHTML = evidence.map((item) => `<tr><td>${item.student}</td><td>${item.event}</td><td>${item.time}</td><td><span class="badge">${item.source}</span></td></tr>`).join("");
-  byId("attendance-body").innerHTML = students.map((student) => `<tr><td>${student.name}<br><small>${student.id}</small></td><td>${student.percentage}%</td><td><span class="badge">${student.status}</span></td><td><button class="secondary correct" data-id="${student.id}">Correct</button></td></tr>`).join("");
-  byId("audit-list").innerHTML = audits.length ? audits.map((audit) => `<li><strong>${audit.student}</strong>: ${audit.before} → ${audit.after}. ${audit.reason} <small>(${audit.at})</small></li>`).join("") : "<li>No corrections recorded.</li>";
+  byId("evidence-body").innerHTML = evidence.map((item) => `<tr><td>${DashboardModel.escapeHtml(item.student)}</td><td>${DashboardModel.escapeHtml(item.event)}</td><td>${DashboardModel.escapeHtml(item.time)}</td><td><span class="badge">${DashboardModel.escapeHtml(item.source)}</span></td></tr>`).join("");
+  byId("attendance-body").innerHTML = students.map((student) => `<tr><td>${DashboardModel.escapeHtml(student.name)}<br><small>${DashboardModel.escapeHtml(student.id)}</small></td><td>${DashboardModel.escapeHtml(student.percentage)}%</td><td><span class="badge">${DashboardModel.escapeHtml(student.status)}</span></td><td><button class="secondary correct" data-id="${DashboardModel.escapeHtml(student.id)}">Correct</button></td></tr>`).join("");
+  byId("audit-list").innerHTML = audits.length ? audits.map((audit) => `<li><strong>${DashboardModel.escapeHtml(audit.student)}</strong>: ${DashboardModel.escapeHtml(audit.before)} → ${DashboardModel.escapeHtml(audit.after)}. ${DashboardModel.escapeHtml(audit.reason)} <small>(${DashboardModel.escapeHtml(audit.at)})</small></li>`).join("") : "<li>No corrections recorded.</li>";
   document.querySelectorAll(".correct").forEach((button) => button.addEventListener("click", () => openCorrection(button.dataset.id)));
 }
 
@@ -56,13 +60,13 @@ byId("save-correction").addEventListener("click", (event) => {
   const before = selectedStudent.status;
   selectedStudent.status = byId("correction-status").value;
   audits.unshift({ student: selectedStudent.name, before, after: selectedStudent.status, reason, at: new Date().toLocaleString() });
+  localStorage.setItem("smartattend-demo-students", JSON.stringify(students));
   localStorage.setItem("smartattend-demo-audits", JSON.stringify(audits));
   byId("correction-dialog").close();
   render();
 });
 byId("csv-button").addEventListener("click", () => {
-  const rows = [["Student ID", "Student", "Percentage", "Status"], ...students.map((s) => [s.id, s.name, s.percentage, s.status])];
-  const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+  const csv = DashboardModel.buildAttendanceCsv(students);
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   link.download = "smartattend-demo-attendance.csv";

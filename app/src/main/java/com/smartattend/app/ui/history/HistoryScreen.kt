@@ -35,11 +35,14 @@ fun HistoryScreen(history: List<AttendanceHistoryItem>) {
                         Text(record.status.name, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
                     Text(record.date.toString(), style = MaterialTheme.typography.bodySmall)
-                    Text("%.1f%% confirmed${if (record.late) " • Late" else ""}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(formatHistorySummary(record.percentage, record.late), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (record.simulated) Text("DEMO EVIDENCE", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
                 }
             }
         }
     }
 }
+
+fun formatHistorySummary(percentage: Double, late: Boolean): String =
+    "%.1f%% confirmed%s".format(percentage, if (late) " • Late" else "")
 
