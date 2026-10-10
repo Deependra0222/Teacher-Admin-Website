@@ -13,6 +13,8 @@ Date: 2026-10-10 (Asia/Calcutta)
 | Teacher dashboard tests | PASS | `node --test teacher-dashboard/dashboard-model.test.js`: 3 tests, 0 failures. |
 | Teacher JavaScript parse | PASS | `node --check` passed for `teacher-dashboard/app.js` and `dashboard-model.js`. |
 | Patch whitespace check | PASS | `git diff --check` found no whitespace errors; Git emitted only Windows line-ending conversion notices. |
+| Emulator install and launch | PASS | Pixel 7 API 36 cold-booted, accepted the debug APK, and displayed `MainActivity`. |
+| Emulator UI smoke test | PASS | Login, Home, Attendance, History, Timetable, and Profile rendered; Enter/Exit/Calculate produced an `ABSENT`, 0.1%, late demo result with the teacher-verification warning. |
 
 ## Covered unit behavior
 
@@ -36,8 +38,8 @@ Date: 2026-10-10 (Asia/Calcutta)
 
 | Scenario | Result | Notes |
 |---|---|---|
-| Install APK on physical phone | NOT RUN | No physical Android device was attached. |
-| Launch and tap through five screens | NOT RUN | The installed API 36 AVD remained `offline`; its emulator processes were stopped after diagnostics. |
+| Install APK on physical phone | NOT RUN | No physical Android device was attached. Emulator installation passed. |
+| Launch and tap through app screens | PASS ON EMULATOR | Pixel 7 API 36 rendered login plus all five main destinations; physical-device behavior remains unverified. |
 | Firebase student login/profile | NOT RUN | No Firebase project or `google-services.json` exists. |
 | Student-vs-teacher Firestore rules | NOT RUN | Firebase CLI/Emulator Suite is not installed and no configured test project exists. Rules were statically reviewed only. |
 | Android-to-dashboard synchronization | NOT RUN | Both sides are intentionally local-only until Firebase is configured. |

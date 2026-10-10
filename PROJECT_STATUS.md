@@ -16,7 +16,7 @@
 
 ## Current task
 
-- Offline build milestones complete; next external milestone is manual device verification, followed by optional Firebase setup.
+- Offline build milestones complete; next external milestone is physical-phone verification, followed by optional Firebase setup.
 
 ## Tests run
 
@@ -27,7 +27,8 @@
 - `node --test teacher-dashboard/dashboard-model.test.js`: PASS, 3 tests, 0 failures.
 - `node --check teacher-dashboard/app.js` and `dashboard-model.js`: PASS.
 - `git diff --check`: PASS (line-ending conversion notices only; no whitespace errors).
-- Android emulator launch: NOT RUN successfully; installed API 36 AVD remained offline and was stopped after diagnostics.
+- Pixel 7 API 36 emulator cold boot and APK install: PASS.
+- Emulator launch/navigation smoke test: PASS; login, Home, Attendance, History, Timetable, and Profile rendered, and the Enter/Exit/Calculate demo flow produced a local result without an app crash.
 
 ## Known issues / blockers
 
@@ -35,7 +36,7 @@
 - No `google-services.json` or Firebase project credentials exist; cloud authentication/sync cannot be verified.
 - Firebase CLI/Emulator Suite is not installed, so the hardened Firestore rules have not been emulator-tested or deployed.
 - No ESP32 hardware is available; BLE attendance cannot be implemented or verified honestly.
-- No physical phone was attached; the available AVD did not come online, so installation and visual tap-through remain unverified.
+- No physical phone was attached, so device-specific installation and behavior remain unverified.
 - Teacher dashboard and Android data are intentionally not synchronized until Firebase is configured.
 
 ## Next action

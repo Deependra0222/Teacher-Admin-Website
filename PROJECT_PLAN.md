@@ -36,7 +36,7 @@ Status: **Completed as a clearly labeled local-only demo.** Firebase synchroniza
 
 ## Milestone 5 - QA and submission pack
 
-Status: **Build, 25 Android JVM tests, 3 teacher-dashboard tests, lint, JavaScript parsing, and documentation completed.** Emulator/phone launch is not verified because the available AVD remained offline and no phone was attached.
+Status: **Build, 25 Android JVM tests, 3 teacher-dashboard tests, lint, JavaScript parsing, emulator smoke testing, and documentation completed.** Physical-phone testing remains manual because no phone was attached.
 
 - Run unit tests and debug assembly.
 - Record actual PASS/FAIL/NOT RUN outcomes.
