@@ -29,6 +29,11 @@ fun ProfileScreen(student: Student, onBack: () -> Unit, onLogout: () -> Unit) {
                 LabeledValue("Batch", student.batch)
             }
         }
-        item { StudentSectionCard("Authentication") { Text("This milestone uses demo login only. Firebase Authentication is not configured."); Button(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Log out of demo") } } }
+        item {
+            StudentSectionCard("Authentication") {
+                Text("Firebase SDK is configured, but this screen still uses local demo login. No Firebase sign-in has been implemented or verified.")
+                Button(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Log out of demo") }
+            }
+        }
     }
 }

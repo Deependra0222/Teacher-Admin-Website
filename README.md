@@ -1,8 +1,8 @@
 # SmartAttend
 
-SmartAttend currently delivers a complete offline-capable **Student Android App milestone** built with Kotlin, Jetpack Compose, Material 3, Navigation Compose, Room, and Preferences DataStore. A teacher website is the next milestone after review; the existing `teacher-dashboard/` prototype has been preserved and was not expanded in this milestone.
+SmartAttend currently delivers a complete offline-capable **Student Android App milestone** built with Kotlin, Jetpack Compose, Material 3, Navigation Compose, Room, and Preferences DataStore. The Android Firebase client SDK foundation is also packaged and initialization-tested. A teacher website is the next major product milestone after review; the existing `teacher-dashboard/` prototype has been preserved and was not expanded in this milestone.
 
-This APK uses realistic demo data and a simulated BLE decision engine. It does **not** scan Bluetooth devices, connect to ESP32 hardware, authenticate with Firebase, synchronize with a teacher, or finalize official attendance. The UI labels these boundaries as `DEMO`, `SIMULATED`, and `NOT VERIFIED BY BLE`.
+This APK uses realistic demo data and a simulated BLE decision engine. Firebase Authentication and Firestore libraries can initialize from the packaged Firebase configuration, but the app does **not** sign in a real account, read or write Firestore, synchronize with a teacher, scan Bluetooth devices, connect to ESP32 hardware, or finalize official attendance. The UI labels these boundaries as `DEMO`, `SIMULATED`, and `NOT VERIFIED BY BLE`.
 
 ## Student features available now
 
@@ -14,6 +14,7 @@ This APK uses realistic demo data and a simulated BLE decision engine. It does *
 - Device registration stored only as `PENDING SERVER VERIFICATION`.
 - Profile, notifications/reminder settings, system/light/dark theme, demo information, logout, and confirmed demo reset.
 - Offline Room data, DataStore preferences, deterministic demo seeding, pending-operation tracking, and backend-ready repositories.
+- Firebase Android SDK foundation using the Google Services plugin, Firebase BoM, Authentication, and Firestore main modules; real service operations are intentionally not connected yet.
 - Simulated BLE filtering/dwell/hysteresis/loss diagnostics with no Bluetooth permission or scanner.
 - Android launch splash plus dedicated Privacy & Permissions and Offline & BLE Diagnostics screens.
 
@@ -64,7 +65,7 @@ adb install -r "D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk"
 
 1. Review this Student Android App.
 2. Build the Teacher Admin Website.
-3. Configure and verify the shared Firebase backend and server-side authorization/finalization.
+3. Implement and verify real Firebase accounts, secured Firestore synchronization, and server-side authorization/finalization using the installed SDK foundation.
 4. Add Android BLE scanning and ESP32 firmware, calibrate with physical devices, and run real classroom tests.
 
 Do not add `google-services.json`, service-account keys, signing keys, or other credentials to source control.

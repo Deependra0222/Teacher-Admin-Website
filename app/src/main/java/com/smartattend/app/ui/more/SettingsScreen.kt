@@ -78,8 +78,8 @@ fun AboutDemoScreen(onBack: () -> Unit) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { BackHeader("About demo mode", "Honest boundaries for this milestone", onBack) }
         item { DemoDataPill("OFFLINE STUDENT MILESTONE") }
-        item { StudentSectionCard("Working now") { Text("Room offline records, DataStore settings, all student navigation, local correction requests, projections, and a platform-independent simulated BLE decision engine.") } }
-        item { StudentSectionCard("Not implemented or verified") { Text("Firebase Authentication/Firestore/Cloud Functions, Android BLE scanning, ESP32 calibration, teacher finalization, real notifications, and physical-device attendance verification.") } }
+        item { StudentSectionCard("Working now") { Text("Room offline records, DataStore settings, all student navigation, local correction requests, projections, Firebase client SDK initialization, and a platform-independent simulated BLE decision engine.") } }
+        item { StudentSectionCard("Not implemented or verified") { Text("Real Firebase accounts, Firestore reads/writes or synchronization, Security Rules emulator tests, Cloud Functions, Android BLE scanning, ESP32 calibration, teacher finalization, real notifications, and physical-device attendance verification.") } }
         item { StudentSectionCard("Safety boundary") { Text("The student app can prepare local evidence and requests. It never finalizes or directly edits official attendance.") } }
     }
 }

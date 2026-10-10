@@ -40,9 +40,16 @@ Status: **Next, pending user review of the Student Android App.**
 - Build the professional teacher workflow for timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings.
 - Keep the site in demo/local mode until the shared Firebase contract is implemented.
 
+## Firebase Android SDK foundation — Completed
+
+- Google Services Gradle plugin `4.5.0` processes the local, Git-ignored `app/google-services.json` for `com.smartattend.app`.
+- Firebase BoM `34.19.0` supplies the non-KTX Authentication and Cloud Firestore main modules.
+- The default Firebase app plus Auth and Firestore client objects initialize on an API 36 emulator.
+- No real sign-in, Firestore read/write, repository synchronization, Security Rules change, Cloud Function, user, or application data was added in this foundation milestone.
+
 ## Milestone 4 — Shared Firebase backend
 
-Status: **Not started; credentials and product decisions required.**
+Status: **Client SDK foundation completed; real accounts, data access, synchronization, rules verification, and server logic not started.**
 
 - Configure Firebase Authentication and student/teacher authorization.
 - Implement secured Firestore collections and verified Security Rules.

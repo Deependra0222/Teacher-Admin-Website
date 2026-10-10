@@ -36,7 +36,7 @@ fun PrivacyPermissionsScreen(onBack: () -> Unit) {
                 PermissionLine("Bluetooth / nearby devices", "Not declared or requested")
                 PermissionLine("Location", "Not declared or requested")
                 PermissionLine("Notifications", "Not declared or requested")
-                PermissionLine("Internet", "Not declared; no Firebase or server calls")
+                PermissionLine("Internet", "Declared by Firebase SDK; no app sign-in or Firestore operation is connected")
                 Text(
                     "Changing the notification preference stores a local setting only; it does not grant Android permission or schedule a notification.",
                     style = MaterialTheme.typography.bodySmall,
@@ -51,7 +51,7 @@ fun PrivacyPermissionsScreen(onBack: () -> Unit) {
         }
         item {
             StudentSectionCard("Future production permission flow") {
-                Text("Bluetooth permissions will be requested only when real ESP32 scanning is implemented and ready for physical-device testing. Firebase access will be added only after project configuration and security-rule verification.")
+                Text("Bluetooth permissions will be requested only when real ESP32 scanning is implemented and ready for physical-device testing. Firebase client configuration is packaged, but account access and data synchronization will be added only with verified authorization and security rules.")
             }
         }
         item {
@@ -92,7 +92,7 @@ fun OfflineDiagnosticsScreen(
                 Text("Attendance records cached: ${state.history.size}")
                 Text("Notices cached: ${state.notices.size}")
                 Text("Pending local operations: ${state.pendingOperations}")
-                Text("Backend is not configured, so pending operations are not uploaded.", style = MaterialTheme.typography.bodySmall)
+                Text("Firebase SDK is configured, but no repository or authentication sync is connected, so pending operations are not uploaded.", style = MaterialTheme.typography.bodySmall)
             }
         }
         item {

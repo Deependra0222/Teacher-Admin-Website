@@ -1,5 +1,7 @@
 *.iml
 .gradle/
+.gradle-firebase/
+.gradle-project-firebase/
 .kotlin/
 .idea/
 local.properties

@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
     id("androidx.room")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -58,7 +59,9 @@ room {
 
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2025.04.01")
+    val firebaseBom = platform("com.google.firebase:firebase-bom:34.19.0")
     implementation(composeBom)
+    implementation(firebaseBom)
     androidTestImplementation(composeBom)
 
     implementation("androidx.core:core-ktx:1.16.0")
@@ -75,6 +78,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 
     ksp("androidx.room:room-compiler:2.8.5")
 

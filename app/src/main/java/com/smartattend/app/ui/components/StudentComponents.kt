@@ -38,7 +38,11 @@ fun DemoDataPill(text: String = "DEMO DATA") {
 fun SyncPill(state: SyncDisplayState, pending: Int) {
     val text = when (state) {
         SyncDisplayState.DEMO_ONLY -> "Demo only"
-        SyncDisplayState.BACKEND_UNCONFIGURED -> if (pending > 0) "Backend not configured • $pending pending" else "Backend not configured"
+        SyncDisplayState.BACKEND_UNCONFIGURED -> if (pending > 0) {
+            "Firebase sync not connected • $pending pending"
+        } else {
+            "Firebase sync not connected"
+        }
         SyncDisplayState.OFFLINE -> "Offline"
         SyncDisplayState.OFFLINE_PENDING -> "Offline • $pending pending"
         SyncDisplayState.SYNCING -> "Syncing"

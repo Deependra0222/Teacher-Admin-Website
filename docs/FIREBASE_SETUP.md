@@ -1,19 +1,34 @@
-# Firebase Setup (Manual, Not Yet Configured)
+# Firebase Android SDK Setup (Connected; Service Operations Pending)
 
-The offline Android build does not require Firebase. Complete this checklist only when you are ready to connect a real Firebase project.
+The offline Android build still works without signing in or reaching Firestore. The Firebase Android client SDK is now packaged, but no production account or database workflow is connected to the student repositories.
 
-## Console steps
+## Completed foundation
 
-1. Create a Firebase project named SmartAttend.
-2. Register an Android app with the exact package `com.smartattend.app`.
-3. Download `google-services.json` and place it at `app/google-services.json`. The file is ignored by Git in this repository.
-4. Enable Authentication > Sign-in method > Email/Password.
-5. Create Cloud Firestore in an appropriate region and publish the repository's `firestore.rules`; do not use open test rules.
-6. Create two student Authentication users and one teacher Authentication user.
-7. In `users/{uid}`, create student profiles with `role: "student"`. Bootstrap the teacher profile manually from a trusted admin environment with `role: "teacher"`. There is deliberately no client-side “make me teacher” path.
-8. Add the Google services plugin and Firebase Auth/Firestore main modules only after the configuration file exists. Use the current Firebase BoM and do not use the discontinued `-ktx` artifacts.
+1. Firebase project SmartAttend and Android app package `com.smartattend.app` were configured by the project owner.
+2. `app/google-services.json` is present locally, package-matched, ignored by Git, and not tracked.
+3. Email/Password Authentication is enabled and Cloud Firestore exists in the Mumbai region in Production mode, as reported by the project owner.
+4. Google Services Gradle plugin `4.5.0` is applied using Kotlin DSL.
+5. Firebase BoM `34.19.0` manages the non-KTX `firebase-auth` and `firebase-firestore` main modules.
+6. Gradle resource processing, debug compilation, and an API 36 instrumentation initialization test pass.
 
-As checked on 2026-10-10, the official Android setup documentation lists Firebase BoM `34.19.0` and Google services plugin `4.5.0`. Recheck official release notes before integration because these versions change.
+Firebase BoM `35.0.0` was evaluated first but selected Firebase Authentication `25.0.0`, whose Kotlin metadata `2.4.0` is newer than this project's Kotlin compiler `2.2.0`. BoM `34.19.0` is the newest version verified here that compiles with the current project toolchain; it resolves Authentication `24.2.0` and Firestore `26.6.0`. Upgrade the project Kotlin toolchain and re-run all checks before moving to a newer BoM.
+
+## Intentionally not performed
+
+- No Authentication user was created and no sign-in was attempted.
+- No Firestore document was read, created, updated, or deleted.
+- `firestore.rules` was not deployed or changed.
+- No repository adapter, background synchronization, Cloud Function, or server-side attendance finalization was enabled.
+- The existing demo login, Room database, DataStore preferences, and simulated BLE flow remain the active app behavior.
+
+## Next implementation milestone
+
+1. Define the authenticated student session state and map Firebase UIDs to trusted `users/{uid}` profiles.
+2. Create test student accounts through a controlled admin workflow; never add credentials to source control.
+3. Implement Firebase repository adapters behind the existing repository interfaces while keeping Room as the offline source of truth.
+4. Define conflict, retry, pending-operation, and sign-out behavior before enabling writes.
+5. Verify authorization with the Firebase Emulator Suite and separate student evidence from teacher-authorized attendance.
+6. Only after emulator verification, review and deploy production Security Rules and then test read-only and write flows with dedicated non-production accounts.
 
 ## Shared collection contract
 
