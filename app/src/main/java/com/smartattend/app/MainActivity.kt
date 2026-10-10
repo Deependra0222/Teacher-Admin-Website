@@ -12,8 +12,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SmartAttendTheme {
-                val viewModel: SmartAttendViewModel = viewModel()
+            val viewModel: SmartAttendViewModel = viewModel()
+            SmartAttendTheme(themePreference = viewModel.uiState.settings.theme) {
                 SmartAttendApp(viewModel)
             }
         }
