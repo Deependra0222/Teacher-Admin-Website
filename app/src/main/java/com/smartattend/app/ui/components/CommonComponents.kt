@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,10 +22,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun DemoBanner(modifier: Modifier = Modifier) {
+fun DemoBanner(modifier: Modifier = Modifier, applyStatusInset: Boolean = true) {
+    val insetModifier = if (applyStatusInset) modifier.statusBarsPadding() else modifier
     Text(
         text = "DEMO - NOT VERIFIED BY BLE",
-        modifier = modifier.fillMaxWidth().background(Color(0xFFFFE9B6)).padding(horizontal = 16.dp, vertical = 9.dp),
+        modifier = insetModifier.fillMaxWidth().background(Color(0xFFFFE9B6)).padding(horizontal = 16.dp, vertical = 9.dp),
         color = Color(0xFF6B4700),
         fontWeight = FontWeight.Bold,
         style = MaterialTheme.typography.labelLarge,

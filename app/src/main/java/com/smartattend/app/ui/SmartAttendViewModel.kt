@@ -121,10 +121,7 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
         private set
 
     init {
-        viewModelScope.launch {
-            runCatching { repository.initialize() }
-                .onFailure { uiState = uiState.copy(isLoading = false, fatalError = it.message ?: "Offline data could not be opened") }
-        }
+        initializeRepository()
         observeRepository()
     }
 
@@ -221,7 +218,16 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
 
     fun setTheme(theme: ThemePreference) = launchPreference("Theme preference saved offline") { repository.setTheme(theme) }
     fun resetDemoData() = repositoryAction("Demo records reset to their original state") { repository.resetDemoData() }
+    fun retryOfflineData() = initializeRepository()
     fun clearMessage() { uiState = uiState.copy(message = null) }
+
+    private fun initializeRepository() {
+        uiState = uiState.copy(isLoading = true, fatalError = null)
+        viewModelScope.launch {
+            runCatching { repository.initialize() }
+                .onFailure { uiState = uiState.copy(isLoading = false, fatalError = it.message ?: "Offline data could not be opened") }
+        }
+    }
 
     private fun observeRepository() {
         viewModelScope.launch { repository.student.collect { value -> if (value != null) uiState = uiState.copy(student = value, isLoading = false, fatalError = null) } }
