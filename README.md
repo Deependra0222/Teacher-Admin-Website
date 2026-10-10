@@ -1,72 +1,69 @@
 # SmartAttend
 
-SmartAttend is an offline-first Android demonstration of continuous classroom attendance. It includes a Kotlin/Jetpack Compose student app, a tested simulated-presence engine, local persistence, Firebase-ready security documentation, and a separate teacher dashboard demo.
+SmartAttend currently delivers a complete offline-capable **Student Android App milestone** built with Kotlin, Jetpack Compose, Material 3, Navigation Compose, Room, and Preferences DataStore. A teacher website is the next milestone after review; the existing `teacher-dashboard/` prototype has been preserved and was not expanded in this milestone.
 
-This build does **not** use real Bluetooth or ESP32 data. Every simulated screen and record is labeled `DEMO - NOT VERIFIED BY BLE`. It is not proxy-proof or production-ready attendance software.
+This APK uses realistic demo data and a simulated BLE decision engine. It does **not** scan Bluetooth devices, connect to ESP32 hardware, authenticate with Firebase, synchronize with a teacher, or finalize official attendance. The UI labels these boundaries as `DEMO`, `SIMULATED`, and `NOT VERIFIED BY BLE`.
 
-## What works now
+## Student features available now
 
-- Local demo login (prefilled `CS-042` / `demo123`); no password is stored.
-- Home/current class with active eligibility, room, time, and Enter/Exit simulation.
-- Attendance totals and shortage warnings.
-- History with Present, Review, Absent, and Late information.
-- Today's timetable and active class indicator.
-- Profile, future BLE placeholder, logout, and restored demo state.
-- Attendance boundaries: >=75% Present, 50% to <75% Review, below 50% Absent; Late is separate.
-- Re-entry accumulation, duplicate event rejection, batch/session validation, and open-interval finalization.
-- Offline teacher dashboard demo with correction reasons, audit history, and CSV export.
+- Dashboard with current/next class, overall attendance, shortage alerts, notices, offline/backend state, and simulated presence.
+- Subject attendance, detail/history, progress, target warnings, and a validated shortage calculator.
+- Date-selectable schedule/calendar with lecture and lab details.
+- Announcements, assignments, attendance alerts, correction updates, filters, read/unread, and mark-all-read.
+- Filterable history and local correction requests with required reasons and duplicate prevention.
+- Device registration stored only as `PENDING SERVER VERIFICATION`.
+- Profile, notifications/reminder settings, system/light/dark theme, demo information, logout, and confirmed demo reset.
+- Offline Room data, DataStore preferences, deterministic demo seeding, pending-operation tracking, and backend-ready repositories.
+- Simulated BLE filtering/dwell/hysteresis/loss diagnostics with no Bluetooth permission or scanner.
 
-## Project structure
+## Open and run in Android Studio on Windows
 
-- `app/` - Android application.
-- `app/src/main/java/com/smartattend/app/core` - shared records.
-- `app/src/main/java/com/smartattend/app/domain` - pure attendance/session/presence behavior.
-- `app/src/main/java/com/smartattend/app/data` - demo data and local persistence.
-- `app/src/main/java/com/smartattend/app/ui` - Material 3 Compose screens.
-- `teacher-dashboard/` - local HTML/CSS/JavaScript teacher demo.
-- `firestore.rules` and `docs/FIREBASE_SETUP.md` - future Firebase boundary.
-- `PROJECT_PLAN.md`, `PROJECT_STATUS.md`, and `TEST_REPORT.md` - handoff and evidence.
+1. Start Android Studio.
+2. Choose **Open**.
+3. Select the whole project folder: `D:\Smart Attend`.
+4. Wait for Gradle sync and indexing to finish. Do not open only the `app` folder.
+5. If Android Studio asks for a Gradle JDK, open **File > Settings > Build, Execution, Deployment > Build Tools > Gradle** and choose JDK 17. The included path is `D:\Smart Attend\.toolchains\jdk17\jdk-17.0.20.1+1`.
+6. Make sure the Windows `C:` drive has several GB free, then open **Tools > Device Manager** and start an emulator; alternatively connect an authorized Android phone with USB debugging enabled. At final handoff this computer had only about 0.04 GB free on `C:`, which blocks a new emulator boot until space is freed.
+7. Select the `app` run configuration and your device in the top toolbar.
+8. Press the green **Run** triangle.
+9. On the login screen, keep the prefilled demo values `CS-042` and `demo123`, then tap **Continue in demo mode**.
 
-## Open and run in Android Studio (Windows)
+Use the five bottom tabs and open their cards to review all nested workflows. On Dashboard, **Simulate signals** runs only the in-app decision engine. It is not real BLE evidence.
 
-1. Open Android Studio and choose **Open**.
-2. Select `D:\Smart Attend` (the folder containing `settings.gradle.kts`).
-3. Allow Gradle sync to finish. The project is configured for Android SDK 35, minimum SDK 26, Gradle 8.12, and JDK 17.
-4. If Android Studio asks for a Gradle JDK, choose `D:\Smart Attend\.toolchains\jdk17\jdk-17.0.20.1+1` or another installed JDK 17.
-5. Connect a phone with USB debugging or start an emulator, select it, and press **Run**.
-6. Use the prefilled demo login. Tap the five bottom-navigation items. On Home, use **Enter**, **Exit**, then **Calculate demo result**.
+## Build from PowerShell
 
-From PowerShell, the beginner-safe build command is:
+The easiest command uses the included JDK helper:
 
 ```powershell
+cd "D:\Smart Attend"
 .\build-smartattend.bat testDebugUnitTest assembleDebug
 ```
 
-The generated debug APK is at `app\build\outputs\apk\debug\app-debug.apk`. To install it on an authorized connected phone:
+The verified APK is:
+
+`D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
+
+To install it with Android Studio, drag the APK onto a running emulator, or use **Run** so Android Studio builds and installs it. If `adb` is already on your PATH and you have authorized your phone, you may also run:
 
 ```powershell
-adb install -r app\build\outputs\apk\debug\app-debug.apk
+adb install -r "D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk"
 ```
 
-## Teacher dashboard demo
+## Project structure
 
-Open `teacher-dashboard\index.html`, or run this inside `teacher-dashboard`:
+- `app/src/main/java/com/smartattend/app/core` — student/domain models.
+- `app/src/main/java/com/smartattend/app/domain` — attendance, correction, shortage, sync, session, and simulated BLE rules.
+- `app/src/main/java/com/smartattend/app/data` — repository contract, Room/DataStore implementation, and deterministic demo seed.
+- `app/src/main/java/com/smartattend/app/ui` — Compose navigation, primary screens, and nested workflows.
+- `app/schemas` — checked-in Room database schema snapshot.
+- `teacher-dashboard/` — preserved local teacher prototype for review in the next milestone.
+- `docs/` and `firestore.rules` — design and future backend readiness documents; not a deployed backend.
 
-```powershell
-python -m http.server 8080
-```
+## Future milestones
 
-Then visit `http://localhost:8080`. The prefilled account is local demo input only. The dashboard and Android app do not synchronize until Firebase is configured.
+1. Review this Student Android App.
+2. Build the Teacher Admin Website.
+3. Configure and verify the shared Firebase backend and server-side authorization/finalization.
+4. Add Android BLE scanning and ESP32 firmware, calibrate with physical devices, and run real classroom tests.
 
-## Firebase setup
-
-Follow `docs/FIREBASE_SETUP.md`. You must create the Firebase project, register `com.smartattend.app`, add `app/google-services.json`, enable Email/Password Authentication, create Firestore, and bootstrap teacher permissions from a trusted admin environment. Do not add service-account keys to either client.
-
-## Future ESP32 integration
-
-Keep `PresenceSource` unchanged and add a real `BlePresenceSource` only after the exact ESP32 boards and Android phone are known. Start with one beacon, then three. Measure RSSI at seats, walls, doors, and corridors; add filtering, dwell time, an initial 2-of-3 rule, and exit timeout based on measurements. BLE RSSI does not provide exact location and cannot by itself prevent spoofing or proxy attendance.
-
-## Backup checklist
-
-Back up all source and documentation, especially `app/src`, Gradle files, `teacher-dashboard`, `firestore.rules`, `docs`, project plan/status, test report, and the APK. Do not back up/share `local.properties`, `app/google-services.json`, signing keys, or `teacher-dashboard/firebase-config.js`. The ignored `.toolchains` JDK can be downloaded again; install/configure JDK 17 when restoring on another computer.
-
+Do not add `google-services.json`, service-account keys, signing keys, or other credentials to source control.

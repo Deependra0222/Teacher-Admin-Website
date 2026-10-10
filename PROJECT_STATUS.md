@@ -1,45 +1,65 @@
 # SmartAttend Project Status
 
-## Completed
+Updated: 2026-10-10 (Asia/Calcutta)
 
-- Inspected all four supplied build-kit files.
-- Confirmed the workspace initially contained no Android project.
-- Confirmed Android Studio, Android SDK platforms 33-36, build tools 35/36, `adb`, and a bundled JDK are installed.
-- Recorded the offline-first design and implementation plan.
-- Created the Android Studio project (`com.smartattend.app`, min SDK 26, compile/target SDK 35).
-- Implemented demo login and Home, Attendance, History, Timetable, and Profile screens with Material 3 navigation.
-- Implemented local persistence, active-session/enrollment validation, `PresenceSource`, `SimulatedPresenceSource`, and tested attendance calculation.
-- Added Firestore data documentation and deny-by-default rules without adding credentials.
-- Added a local teacher dashboard with session controls, evidence/final tables, correction audit, and CSV export.
-- Applied an independent review hardening pass: rejected backward timestamps, retained unfinalized expired evidence, persisted completed results and dashboard corrections, escaped audit HTML, labeled CSV exports as simulation-only, and tightened Firestore validation/audit requirements.
-- Added README, test report, demo script, viva notes, Gradle helper, and generated a debug APK.
+## Current outcome
 
-## Current task
+The approved **SmartAttend Student Android App milestone is implemented, buildable, and ready for review**. The generated debug APK is:
 
-- Offline build milestones complete; next external milestone is physical-phone verification, followed by optional Firebase setup.
+`D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
 
-## Tests run
+All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, or `NOT VERIFIED BY BLE`. No Firebase, real Android BLE scan, ESP32 signal, teacher finalization, or production identity is claimed.
 
-- `gradlew tasks --all`: PASS under project-local Temurin JDK 17.
-- `gradlew testDebugUnitTest`: PASS, 25 tests across 6 suites, 0 failures, 0 errors.
-- `gradlew assembleDebug`: PASS; generated `app/build/outputs/apk/debug/app-debug.apk`.
-- `gradlew lintDebug`: PASS with 0 errors and 8 version/target recommendations documented in `TEST_REPORT.md`.
-- `node --test teacher-dashboard/dashboard-model.test.js`: PASS, 3 tests, 0 failures.
-- `node --check teacher-dashboard/app.js` and `dashboard-model.js`: PASS.
-- `git diff --check`: PASS (line-ending conversion notices only; no whitespace errors).
-- Pixel 7 API 36 emulator cold boot and APK install: PASS.
-- Emulator launch/navigation smoke test: PASS; login, Home, Attendance, History, Timetable, and Profile rendered, and the Enter/Exit/Calculate demo flow produced a local result without an app crash.
+## Completed student features
 
-## Known issues / blockers
+- Demo student login with explicit non-production authentication wording.
+- Five-destination Navigation Compose shell: Dashboard, Attendance, Schedule, Inbox, and More.
+- Premium responsive Material 3 cards, semantic icons, light/dark/system theme preference, status/error/empty/loading states, and system-bar handling.
+- Dashboard with overall attendance, shortages, current/next class, inbox count, sync state, and simulated presence diagnostics.
+- Subject cards, percentages, progress, target warnings, subject detail, and history links.
+- Shortage calculator with input validation, finite 100% handling, classes-to-attend, and classes-that-can-be-missed projections.
+- Filterable attendance history with late/source labels and correction entry.
+- Calendar/agenda date controls plus lecture/lab detail screens.
+- Notice filters, assignment deadlines, read/unread, mark-all-read, and persisted offline state.
+- Correction request list/form/detail, mandatory ten-character reason, status change validation, duplicate-open-request rejection, and local pending operations.
+- Installation-scoped device ID and local `PENDING_SERVER_VERIFICATION` registration only.
+- Persistent notification, reminder, theme, seed-version, and demo-reset settings.
+- Room database for profile, subjects, history, schedule, notices, corrections, registered device, metadata, and pending operations.
+- Idempotent, deterministic, versioned demo seed with stable identifiers.
+- Existing duration attendance tracking and local in-progress/result persistence preserved.
+- Simulated BLE decision engine with allowlisted session/beacons, median window, EMA, distinct-beacon threshold, verification dwell, entry/exit hysteresis, signal-loss timeout, and invalid/backward sample rejection.
+- Retryable offline-database initialization error state.
 
-- `java`, `javac`, and `gradle` are not on the system `PATH`; use `build-smartattend.bat` or set Android Studio's Gradle JDK to the included project-local JDK 17.
-- No `google-services.json` or Firebase project credentials exist; cloud authentication/sync cannot be verified.
-- Firebase CLI/Emulator Suite is not installed, so the hardened Firestore rules have not been emulator-tested or deployed.
-- No ESP32 hardware is available; BLE attendance cannot be implemented or verified honestly.
-- No physical phone was attached, so device-specific installation and behavior remain unverified.
-- Teacher dashboard and Android data are intentionally not synchronized until Firebase is configured.
+## BLE regression fixed
 
-## Next action
+The interrupted focused test expected `SIGNAL_LOST` at the configured timeout but received `STAYING`. The timer-only `advanceTime` path was incorrectly refreshing `lastConfidentAt` from a cached RSSI track. The engine now extends confidence only when `process` receives a newly observed qualifying sample. The focused BLE suite and complete JVM suite pass.
 
-- Open the project in Android Studio, select a working phone/emulator, install the verified debug APK, and follow `DEMO_SCRIPT.md`.
-- After that, create the Firebase project and follow `docs/FIREBASE_SETUP.md` if cloud login/sync is required.
+## Actual verification results
+
+- `gradlew.bat testDebugUnitTest assembleDebug lintDebug`: **PASS**.
+- JVM tests: **48 tests, 12 suites, 0 failures, 0 errors**.
+- Pixel 7 Android API 36 Room/repository instrumentation: **2 tests, 0 failures**.
+- Android lint: **PASS, 0 errors, 9 version/target recommendations**.
+- Debug APK: **19,202,482 bytes**.
+- APK SHA-256: `D8BC9F86CD3CC8F552FEDE8610FEABEA61DA11CEB2351591E211E4C28A2BEF57`.
+- Emulator install/launch: **PASS** on `Pixel_7` API 36.
+- Emulator navigation smoke: **PASS** for login, all five primary destinations, calculator, subject detail, history/correction form, schedule detail, notice detail, profile, correction list, device, settings, and demo-information routes.
+- Emulator device registration action: **PASS** for rendering `PENDING SERVER VERIFICATION`.
+- Physical Android phone: **NOT RUN**; no phone was attached.
+
+The `Medium_Phone_API_36` AVD remained offline in ADB and was not used. The separate `Pixel_7` API 36 AVD booted and supplied the successful evidence above.
+
+Current environment blocker: the Windows `C:` drive had only about **0.04 GB free** at final handoff. A later emulator restart correctly refused to start for insufficient disk space. Free several GB on `C:` (or connect a phone) before the next Android Studio run; no project or AVD data was deleted automatically.
+
+## Pending / intentionally unverified
+
+- Real Firebase Authentication, Firestore reads/writes, synchronization, Security Rules emulator tests, Cloud Functions, and server finalization.
+- Teacher Admin Website development beyond the preserved existing prototype.
+- Android BLE permissions/scanning/service behavior, ESP32 firmware, RSSI calibration, and real signal-loss tests.
+- Real notifications/alarms; current notification settings and inbox records are offline app data only.
+- Physical-phone UI, accessibility, background/battery, OEM behavior, and installation testing.
+- Production security, release signing, Play Store packaging, and deployment.
+
+## Next major goal
+
+After the user reviews this Student Android App milestone, build the **Teacher Admin Website**. Then connect both clients through the real Firebase backend. ESP32/BLE integration and hardware testing follow last.

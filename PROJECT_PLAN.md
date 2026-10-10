@@ -1,50 +1,66 @@
 # SmartAttend Project Plan
 
-## Milestone 1 - Launchable offline Android MVP
+## Product architecture and delivery order
 
-Status: **Completed and debug APK verified.** Physical-device tap-through remains manual.
+SmartAttend has two clients that will eventually share one Firebase backend:
 
-- Create the Android Studio project with package `com.smartattend.app`, min SDK 26, Kotlin, Compose, and Material 3.
-- Add demo login, Home, Attendance, History, Timetable, and Profile.
-- Add visible `DEMO - NOT VERIFIED BY BLE` labels and local sample data.
-- Build and verify a debug APK.
+1. **Student Android application** — native Kotlin/Jetpack Compose app. This is the completed current milestone.
+2. **Teacher Admin Website** — the next major milestone, after student-app review. The existing `teacher-dashboard/` demo is preserved for possible reuse.
+3. **Shared Firebase backend** — Authentication, secured Firestore records, Cloud Functions, audit logs, and synchronization for both clients.
+4. **ESP32/BLE integration** — Android scanning, measured RSSI calibration, real-device duration/loss tests, and secure server-side attendance finalization.
 
-## Milestone 2 - Offline attendance engine
+A website is not required for students. Firebase and ESP32 work must not be represented as complete until credentials, deployment, and hardware tests exist.
 
-Status: **Completed with 25 passing JVM tests across attendance, session, persistence, login, and formatting behavior.**
+## Milestone 1 — Launchable offline Android MVP
 
-- Add `PresenceSource` and `SimulatedPresenceSource`.
-- Validate active session and enrollment before accepting an event.
-- Accumulate non-overlapping presence intervals across re-entry.
-- Calculate Present/Review/Absent and a separate late flag.
-- Persist in-progress demo state locally and cover required boundary cases with tests.
+Status: **Completed.**
 
-## Milestone 3 - Firebase readiness
+- Android Studio project `com.smartattend.app`, minimum SDK 26, Compose/Material 3.
+- Demo login and the original Home, Attendance, History, Timetable, and Profile experience.
+- Existing duration attendance engine, session validation, result persistence, and demo labels.
 
-Status: **Readiness completed; live integration blocked by the intentionally absent Firebase project/configuration.**
+## Milestone 2 — Complete offline student application
 
-- Document the `users`, `subjects`, `enrollments`, `timetable`, `sessions`, `presenceEvents`, `attendance`, and `auditLogs` schema.
-- Add restrictive Firestore rules and manual console setup steps.
-- Integrate Authentication/Firestore only after a matching `google-services.json` exists.
+Status: **Completed and verified on an API 36 emulator.**
 
-## Milestone 4 - Teacher dashboard
+- Incremental single-module `core` / `domain` / `data` / `ui` architecture.
+- Room 2.8.5 for structured records and pending operations.
+- Preferences DataStore 1.2.1 for installation ID, seed version, notifications, reminder lead time, and theme.
+- Repository interfaces keep a future Firebase adapter separate from screens.
+- Navigation Compose with five primary destinations and all approved nested workflows.
+- Dashboard, subject attendance/detail, filterable history, shortage calculator, calendar/agenda schedule, notices, correction requests, device registration, settings, profile, and demo-boundary screens.
+- Persistent offline mutations and explicit backend-unconfigured/pending states.
+- Platform-independent BLE decision engine using simulated signals, allowlists, median/EMA filtering, dwell, hysteresis, and signal-loss timeout.
 
-Status: **Completed as a clearly labeled local-only demo.** Firebase synchronization is not claimed.
+## Milestone 3 — Teacher Admin Website
 
-- Provide a responsive local demo for session start/stop, evidence, final attendance, justified correction, audit log, and CSV export.
-- Keep local demo data visibly separate from a future Firebase-connected mode.
+Status: **Next, pending user review of the Student Android App.**
 
-## Milestone 5 - QA and submission pack
+- Review the existing `teacher-dashboard/` prototype before deciding what can be reused.
+- Build the professional teacher workflow for timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings.
+- Keep the site in demo/local mode until the shared Firebase contract is implemented.
 
-Status: **Build, 25 Android JVM tests, 3 teacher-dashboard tests, lint, JavaScript parsing, emulator smoke testing, and documentation completed.** Physical-phone testing remains manual because no phone was attached.
+## Milestone 4 — Shared Firebase backend
 
-- Run unit tests and debug assembly.
-- Record actual PASS/FAIL/NOT RUN outcomes.
-- Add README, demo script, viva notes, backup list, and precise limitations.
+Status: **Not started; credentials and product decisions required.**
 
-## Future hardware phase
+- Configure Firebase Authentication and student/teacher authorization.
+- Implement secured Firestore collections and verified Security Rules.
+- Implement Cloud Functions for idempotent evidence processing, teacher actions, device registration, and final attendance.
+- Add offline synchronization adapters behind existing repositories.
+- Test with Firebase Emulator Suite before any deployment.
 
-- After three ESP32 boards and the target phone are available, implement `BlePresenceSource` without changing attendance calculation.
-- Calibrate multi-node RSSI/dwell/exit behavior with measured classroom data.
-- Preserve simulation mode for diagnostics and never claim exact location or proxy prevention.
+## Milestone 5 — ESP32 and real BLE
 
+Status: **Not started; hardware required.**
+
+- Add Android runtime permissions and a scanner adapter that produces the existing `BleSample` model.
+- Calibrate actual ESP32 nodes and phone models in classrooms, corridors, doors, and obstructed seating.
+- Verify dwell, RSSI thresholds, multi-node rules, loss timeout, reconnects, battery/background limits, and adversarial conditions.
+- Finalize attendance only on the server after enrollment, session, device, evidence, and teacher checks.
+
+## Milestone 6 — Production readiness
+
+Status: **Future.**
+
+- Physical-device/accessibility matrix, production observability, privacy/legal review, release signing, backup/retention policy, performance, and store distribution.

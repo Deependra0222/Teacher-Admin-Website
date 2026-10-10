@@ -1,56 +1,68 @@
-# SmartAttend Test Report
+# SmartAttend Student Android App Test Report
 
 Date: 2026-10-10 (Asia/Calcutta)
 
-## Automated checks
+## Automated verification
 
 | Check | Result | Evidence |
 |---|---|---|
-| Gradle project configuration | PASS | `gradlew tasks --all` exited 0 under project-local Temurin JDK 17. |
-| JVM unit tests | PASS | `gradlew testDebugUnitTest`: 25 tests across 6 suites, 0 failures, 0 errors. |
-| Debug APK assembly | PASS | `gradlew assembleDebug` exited 0 and generated `app/build/outputs/apk/debug/app-debug.apk`. |
-| Android lint | PASS WITH WARNINGS | `gradlew lintDebug`: 0 errors, 8 version/target recommendations pinned for the verified SDK 35 toolchain. |
-| Teacher dashboard tests | PASS | `node --test teacher-dashboard/dashboard-model.test.js`: 3 tests, 0 failures. |
-| Teacher JavaScript parse | PASS | `node --check` passed for `teacher-dashboard/app.js` and `dashboard-model.js`. |
-| Patch whitespace check | PASS | `git diff --check` found no whitespace errors; Git emitted only Windows line-ending conversion notices. |
-| Emulator install and launch | PASS | Pixel 7 API 36 cold-booted, accepted the debug APK, and displayed `MainActivity`. |
-| Emulator UI smoke test | PASS | Login, Home, Attendance, History, Timetable, and Profile rendered; Enter/Exit/Calculate produced an `ABSENT`, 0.1%, late demo result with the teacher-verification warning. |
+| Focused BLE unit suite after regression fix | PASS | 7 tests; the signal-loss deadline now ignores cached timer-only observations. |
+| Complete JVM suite | PASS | 48 tests across 12 suites; 0 failures, 0 errors. |
+| Requested build command | PASS | `gradlew.bat testDebugUnitTest assembleDebug` completed successfully with the project JDK 17 environment. |
+| Android lint | PASS WITH RECOMMENDATIONS | `lintDebug`: 0 errors, 9 dependency/target-version recommendations. |
+| Instrumentation suite | PASS | `connectedDebugAndroidTest`: 2 tests, 0 failures on Pixel 7 API 36. |
+| Debug APK install | PASS | `installDebug` installed the APK on Pixel 7 API 36. |
+| APK output | PASS | `app/build/outputs/apk/debug/app-debug.apk`, 19,202,482 bytes. |
+| APK integrity | RECORDED | SHA-256 `D8BC9F86CD3CC8F552FEDE8610FEABEA61DA11CEB2351591E211E4C28A2BEF57`. |
 
-## Covered unit behavior
+The Android project uses Gradle 8.12, Android Gradle Plugin 8.9.1, Kotlin/Compose plugin 2.2.0, Room 2.8.5, DataStore 1.2.1, compile/target SDK 35, minimum SDK 26, and JDK 17.
 
-- 100%, 75%, 74.9%, 50%, and 49.9% policy boundaries.
-- Confirmed time clamped to scheduled duration.
-- Re-entry with no counting between intervals.
-- Repeated Enter and repeated Exit rejection.
-- Backward/out-of-order event rejection without double counting or invalid interval closure.
-- Late arrival after the grace period.
-- Early exit resulting below 50%.
-- Wrong-batch and inactive-session rejection.
-- Session end closes an open interval at the scheduled end.
-- Pre-session evidence rejection.
-- Expired evidence retention until finalization, followed by safe rotation to a new demo session.
-- Blank identifier, short password, and valid demo login validation.
-- No class, upcoming, active eligible, and active ineligible session display states.
-- History percentage formatting.
-- Persisted teacher corrections, escaped audit content, and CSV simulation/BLE disclaimer.
+## JVM behavior covered
 
-## Manual/end-to-end checks
+- Existing Present/Review/Absent boundaries, late handling, clamping, re-entry, duplicate events, batch/session validation, expired evidence, and persisted-session policy.
+- Login validation, session display states, and history formatting.
+- Shortage projections including valid recovery/miss counts, invalid counts/targets, exact targets, and unreachable 100% cases.
+- Correction validation: minimum reason, changed status, duplicate pending request, and valid submission.
+- Sync-state reduction for demo, backend-unconfigured, offline/pending, syncing, synchronized, and failure modes.
+- BLE allowlist, distinct-beacon threshold, dwell, median/EMA outlier rejection, hysteresis, staying, signal loss, unknown beacon, wrong session, invalid RSSI, and backward timestamp rejection.
+- Deterministic seed IDs, demo provenance, distinct dates/types, and seeded correction examples.
+- Nested route encoding/decoding and malformed-route rejection.
 
-| Scenario | Result | Notes |
+## Instrumentation behavior covered
+
+- In-memory Room inserts and observable flows.
+- Persisted notice read mutation.
+- Open-correction lookup.
+- Transactional database clearing.
+- Idempotent repository initialization and non-duplicated seed.
+- Duplicate open correction rejection and pending-operation creation.
+- Transactional demo reset.
+
+## Emulator checks actually performed
+
+The `Pixel_7` AVD booted on Android API 36. The APK installed and launched. UI hierarchy/screenshot checks confirmed:
+
+- Demo login and Dashboard.
+- Attendance, Schedule, Inbox, and More primary destinations.
+- Shortage calculator, subject detail, filtered history, correction form, schedule detail, and notice detail.
+- Profile, correction list, device registration, settings, and About Demo routes.
+- Device registration action rendered `PENDING SERVER VERIFICATION`.
+- Demo labels and backend-unconfigured state were visible.
+
+The `Medium_Phone_API_36` AVD remained `offline` in ADB; it was abandoned without wiping its data. During a later persistence recapture Windows first reported paging/process-launch errors; a clean emulator invocation then identified the concrete blocker: `C:` had only about 0.04 GB free, so the AVD refused to start. That specific post-restart UI recapture is not claimed. Repository persistence behavior remains covered by implementation and instrumentation tests, while physical process-death/OEM behavior remains for device testing.
+
+## Not run / not verified
+
+| Scenario | Result | Reason |
 |---|---|---|
-| Install APK on physical phone | NOT RUN | No physical Android device was attached. Emulator installation passed. |
-| Launch and tap through app screens | PASS ON EMULATOR | Pixel 7 API 36 rendered login plus all five main destinations; physical-device behavior remains unverified. |
-| Firebase student login/profile | NOT RUN | No Firebase project or `google-services.json` exists. |
-| Student-vs-teacher Firestore rules | NOT RUN | Firebase CLI/Emulator Suite is not installed and no configured test project exists. Rules were statically reviewed only. |
-| Android-to-dashboard synchronization | NOT RUN | Both sides are intentionally local-only until Firebase is configured. |
-| Real BLE/ESP32 presence | NOT RUN | No hardware exists; no BLE implementation is included. |
+| Physical Android phone | NOT RUN | No phone was attached. |
+| Real Firebase login/sync/rules/functions | NOT RUN | No Firebase project, credentials, `google-services.json`, or deployed backend. |
+| Real Android notifications | NOT RUN | This milestone stores preferences and inbox records only. |
+| Real BLE scan/service | NOT RUN | No Bluetooth permission or scanner was added by design. |
+| ESP32 RSSI/dwell/loss calibration | NOT RUN | No hardware was available. |
+| Server-side attendance finalization | NOT RUN | Cloud Functions/backend are not configured. |
+| Production security/release signing | NOT RUN | APK is a debug artifact. |
 
-## Known limitations
+## Known lint recommendations
 
-- Demo login is not security.
-- Student presence controls are untrusted local evidence.
-- Teacher dashboard state is local to its browser and not synchronized with Android.
-- The APK is debug-signed and is not a Play Store/release artifact.
-- Device-specific UI, background restrictions, and accessibility still need physical-device verification.
-- BLE RSSI is variable, penetrates some walls, can be spoofed, and cannot prove identity or exact location.
-
+Lint reports only target/dependency update recommendations: target SDK 35 and several intentionally pinned AndroidX test/runtime versions. There are no lint errors. These warnings should be reconsidered with the next verified toolchain upgrade rather than changed without regression testing.
