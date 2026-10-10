@@ -7,6 +7,11 @@ import com.smartattend.app.data.local.entity.AttendanceHistoryEntity
 import com.smartattend.app.data.local.entity.CorrectionRequestEntity
 import com.smartattend.app.data.local.entity.NoticeEntity
 import com.smartattend.app.data.local.entity.StudentEntity
+import com.smartattend.app.core.model.AttendanceStatus
+import com.smartattend.app.data.RepositoryResult
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -58,5 +63,39 @@ class SmartAttendDatabaseTest {
         assertNull(dao.observeStudent().first())
         assertEquals(emptyList<NoticeEntity>(), dao.observeNotices().first())
         assertNull(dao.findOpenCorrection("attendance"))
+    }
+
+    @Test
+    fun repositorySeedIsIdempotentAndMutationsRemainPendingUntilBackendExists() = runTest {
+        val repository = OfflineStudentRepository(
+            database = database,
+            preferences = AppPreferencesRepository(ApplicationProvider.getApplicationContext()),
+            clock = Clock.fixed(Instant.parse("2026-10-10T04:30:00Z"), ZoneOffset.UTC),
+        )
+
+        repository.initialize()
+        repository.setNoticeRead("notice-welcome", true)
+        repository.initialize()
+        val first = repository.submitCorrection(
+            attendanceId = "history-se-1",
+            requestedStatus = AttendanceStatus.PRESENT,
+            reason = "I attended and can provide supporting records",
+        )
+        val duplicate = repository.submitCorrection(
+            attendanceId = "history-se-1",
+            requestedStatus = AttendanceStatus.PRESENT,
+            reason = "A second request should never be inserted",
+        )
+
+        assertEquals(4, repository.subjects.first().size)
+        assertEquals(true, repository.notices.first().first { it.id == "notice-welcome" }.isRead)
+        assertEquals(RepositoryResult.Success, first)
+        assertEquals(true, duplicate is RepositoryResult.Error)
+        assertEquals(1, repository.corrections.first().count { it.attendanceId == "history-se-1" })
+        assertEquals(2, repository.pendingOperationCount.first())
+
+        repository.resetDemoData()
+        assertEquals(false, repository.notices.first().first { it.id == "notice-welcome" }.isRead)
+        assertEquals(0, repository.pendingOperationCount.first())
     }
 }

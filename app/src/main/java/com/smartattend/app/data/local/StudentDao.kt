@@ -47,6 +47,9 @@ interface StudentDao {
     @Query("SELECT * FROM correction_requests WHERE attendanceId = :attendanceId AND status IN ('PENDING', 'SYNC_FAILED') LIMIT 1")
     suspend fun findOpenCorrection(attendanceId: String): CorrectionRequestEntity?
 
+    @Query("SELECT * FROM attendance_history WHERE id = :id LIMIT 1")
+    suspend fun findHistory(id: String): AttendanceHistoryEntity?
+
     @Query("SELECT value FROM metadata WHERE `key` = :key LIMIT 1") suspend fun metadataValue(key: String): String?
     @Query("SELECT COUNT(*) FROM pending_operations") suspend fun pendingOperationCount(): Int
 
