@@ -78,6 +78,14 @@ fun DashboardScreen(
                 Text(if (state.insideClassroom) "Demo state: inside classroom" else "Demo state: outside classroom")
                 Text("Confirmed demo time: ${state.confirmedMinutes} min")
                 state.bleDecision?.let { Text("Engine: ${it.kind} • ${it.reason}", style = MaterialTheme.typography.bodySmall) }
+                state.finalResult?.let { result ->
+                    Text(
+                        "Local demo result: ${result.status.name} • %.1f%%${if (result.late) " • Late" else ""}".format(result.percentage),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text("Calculated locally — teacher verification is still required", style = MaterialTheme.typography.bodySmall)
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = onSimulatePresence) { Text("Simulate signals") }
                     OutlinedButton(onClick = onSimulateLoss) { Text("Simulate loss") }

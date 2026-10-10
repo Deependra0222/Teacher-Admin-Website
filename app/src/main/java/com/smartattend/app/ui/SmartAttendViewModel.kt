@@ -44,6 +44,8 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 data class SmartAttendUiState(
@@ -116,6 +118,7 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
         ),
     )
     private var bleCursor: Instant = startupNow
+    private var repositoryObservationJob: Job? = null
 
     var uiState by mutableStateOf(baseState(preferences.isLoggedIn).copy(finalResult = restoredResult))
         private set
@@ -218,7 +221,10 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
 
     fun setTheme(theme: ThemePreference) = launchPreference("Theme preference saved offline") { repository.setTheme(theme) }
     fun resetDemoData() = repositoryAction("Demo records reset to their original state") { repository.resetDemoData() }
-    fun retryOfflineData() = initializeRepository()
+    fun retryOfflineData() {
+        observeRepository()
+        initializeRepository()
+    }
     fun clearMessage() { uiState = uiState.copy(message = null) }
 
     private fun initializeRepository() {
@@ -230,16 +236,26 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     private fun observeRepository() {
-        viewModelScope.launch { repository.student.collect { value -> if (value != null) uiState = uiState.copy(student = value, isLoading = false, fatalError = null) } }
-        viewModelScope.launch { repository.subjects.collect { uiState = uiState.copy(subjects = it) } }
-        viewModelScope.launch { repository.history.collect { uiState = uiState.copy(history = it) } }
-        viewModelScope.launch { repository.schedule.collect { uiState = uiState.copy(timetable = it) } }
-        viewModelScope.launch { repository.notices.collect { uiState = uiState.copy(notices = it) } }
-        viewModelScope.launch { repository.corrections.collect { uiState = uiState.copy(corrections = it) } }
-        viewModelScope.launch { repository.device.collect { uiState = uiState.copy(device = it) } }
-        viewModelScope.launch { repository.settings.collect { uiState = uiState.copy(settings = it) } }
-        viewModelScope.launch { repository.pendingOperationCount.collect { uiState = uiState.copy(pendingOperations = it) } }
-        viewModelScope.launch { repository.syncState.collect { uiState = uiState.copy(syncState = it) } }
+        repositoryObservationJob?.cancel()
+        repositoryObservationJob = viewModelScope.launch {
+            launch { repository.student.catch { repositoryFailure(it) }.collect { value -> if (value != null) uiState = uiState.copy(student = value, isLoading = false, fatalError = null) } }
+            launch { repository.subjects.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(subjects = it) } }
+            launch { repository.history.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(history = it) } }
+            launch { repository.schedule.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(timetable = it) } }
+            launch { repository.notices.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(notices = it) } }
+            launch { repository.corrections.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(corrections = it) } }
+            launch { repository.device.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(device = it) } }
+            launch { repository.settings.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(settings = it) } }
+            launch { repository.pendingOperationCount.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(pendingOperations = it) } }
+            launch { repository.syncState.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(syncState = it) } }
+        }
+    }
+
+    private fun repositoryFailure(error: Throwable) {
+        uiState = uiState.copy(
+            isLoading = false,
+            fatalError = error.message ?: "Offline data stream failed",
+        )
     }
 
     private fun repositoryAction(successMessage: String, action: suspend () -> RepositoryResult) {
