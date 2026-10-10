@@ -1,0 +1,15 @@
+*.iml
+.gradle/
+.idea/
+local.properties
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+app/google-services.json
+teacher-dashboard/firebase-config.js
+*.jks
+*.keystore
+.superpowers/
+.toolchains/
+

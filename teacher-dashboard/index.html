@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SmartAttend Teacher Demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="demo-banner">LOCAL DEMO • NOT CONNECTED TO FIREBASE • NOT VERIFIED BY BLE</div>
+  <main class="shell">
+    <section id="login-panel" class="login card">
+      <p class="eyebrow">SMARTATTEND</p>
+      <h1>Teacher dashboard</h1>
+      <p>This offline login is a demonstration only. Use Firebase Authentication before any real deployment.</p>
+      <label>Email <input id="email" type="email" value="teacher@demo.smartattend"></label>
+      <label>Demo password <input id="password" type="password" value="demo123"></label>
+      <p id="login-error" class="error" role="alert"></p>
+      <button id="login-button">Continue in local demo</button>
+    </section>
+
+    <section id="dashboard" hidden>
+      <header class="topbar">
+        <div><p class="eyebrow">SMARTATTEND</p><h1>Operating Systems • Lab 204</h1></div>
+        <button id="logout-button" class="secondary">Log out</button>
+      </header>
+      <section class="stats">
+        <article class="card"><span>Session</span><strong id="session-status">Not started</strong></article>
+        <article class="card"><span>Students</span><strong>3 demo</strong></article>
+        <article class="card"><span>Evidence source</span><strong>Simulation</strong></article>
+      </section>
+      <section class="card session-card">
+        <div><h2>Today's class session</h2><p>Teacher-controlled demo state. Starting this does not start the Android app.</p></div>
+        <div class="actions"><button id="start-button">Start session</button><button id="stop-button" class="secondary" disabled>Stop & finalize</button></div>
+      </section>
+      <section class="grid">
+        <article class="card"><h2>Live demo evidence</h2><div class="table-wrap"><table><thead><tr><th>Student</th><th>Event</th><th>Time</th><th>Source</th></tr></thead><tbody id="evidence-body"></tbody></table></div></article>
+        <article class="card"><h2>Final attendance</h2><div class="table-wrap"><table><thead><tr><th>Student</th><th>Percent</th><th>Status</th><th>Action</th></tr></thead><tbody id="attendance-body"></tbody></table></div><button id="csv-button" class="secondary">Export CSV</button></article>
+      </section>
+      <section class="card">
+        <h2>Correction audit log</h2>
+        <p>Every teacher correction requires a written reason.</p>
+        <ul id="audit-list" class="audit-list"></ul>
+      </section>
+    </section>
+  </main>
+  <dialog id="correction-dialog">
+    <form method="dialog">
+      <h2>Correct attendance</h2>
+      <p id="correction-student"></p>
+      <label>New status <select id="correction-status"><option>Present</option><option>Late</option><option>Review</option><option>Absent</option></select></label>
+      <label>Reason <textarea id="correction-reason" minlength="5" required placeholder="Explain why this correction is needed"></textarea></label>
+      <p id="correction-error" class="error"></p>
+      <div class="actions"><button value="cancel" class="secondary">Cancel</button><button id="save-correction" value="default">Save correction</button></div>
+    </form>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>
+

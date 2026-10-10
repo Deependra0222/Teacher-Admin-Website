@@ -1,0 +1,345 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="color-scheme" content="light"/><title>SmartAttend - Codex Offline Build Guide</title><style>
+:root{--navy:#122b4d;--blue:#1769e0;--text:#26374a;--muted:#63758a;--paper:#fff;--bg:#f4f7fb;--line:#dce5ef;--soft:#eaf2ff;--green:#177d5a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,'DejaVu Sans',sans-serif;line-height:1.58}a{color:var(--blue)}a:hover{text-decoration:none}
+.layout{display:grid;grid-template-columns:255px minmax(0,1fr);max-width:1440px;margin:auto;min-height:100vh}.sidebar{background:var(--navy);color:white;padding:26px 18px;position:sticky;top:0;height:100vh;overflow-y:auto}.brand{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px}.subbrand{font-size:12px;color:#c4d7f2;margin-bottom:24px}.sidebar a{color:#e0ecff;display:block;text-decoration:none;border-radius:9px;padding:8px 12px;font-size:13px}.sidebar a:hover{background:#254669}.main{padding:36px 48px 80px;max-width:1080px;width:100%;min-width:0}.hero{background:linear-gradient(115deg,#0d2a4b,#1753a2);padding:34px;border-radius:20px;color:white;margin-bottom:28px}.hero h1{font-size:34px;line-height:1.18;margin:0 0 12px}.hero p{color:#e8f2ff;max-width:740px;font-size:16px}.eyebrow{font-size:11px;letter-spacing:1.4px;font-weight:800;text-transform:uppercase;color:#a9d0ff}.herogrid{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.pill{padding:6px 10px;border:1px solid #80a8dc;border-radius:99px;font-size:12px;color:white}section{margin:0 0 38px;scroll-margin-top:28px}.section-title{font-size:23px;letter-spacing:-.5px;color:var(--navy);margin:0 0 10px}.intro{color:var(--muted)}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0;box-shadow:0 2px 12px rgba(25,57,95,.035)}.card h3{margin:0 0 8px;color:var(--navy)}.callout{border-left:4px solid var(--blue);background:#eef5ff;padding:14px 16px;border-radius:6px;margin:15px 0}.warn{border-left-color:#cc8a24;background:#fff6e6}.good{border-left-color:var(--green);background:#e9f6ee}ul,ol{padding-left:24px}li{margin:5px 0}table{width:100%;border-collapse:collapse;background:white;font-size:13px}th{background:var(--navy);color:white;text-align:left}th,td{padding:10px 12px;border:1px solid var(--line);vertical-align:top}tr:nth-child(even) td{background:#fafcff}code,.inlinecode{font-family:Consolas,'DejaVu Sans Mono',monospace;font-size:.87em;background:#edf2f7;border-radius:3px;padding:1px 4px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c2138;color:#e8f1fb;border:1px solid #244361;border-radius:11px;padding:18px;font-size:12px;line-height:1.58;font-family:Consolas,'DejaVu Sans Mono',monospace;max-width:100%;margin:12px 0}.prompt{margin:14px 0 18px;background:white;border:1px solid #d5e3f5;border-radius:13px;overflow:hidden}.prompt summary{cursor:pointer;list-style:none;padding:16px 18px;display:flex;align-items:center;gap:9px;background:#f2f7ff}.prompt summary::-webkit-details-marker{display:none}.prompt .body{padding:0 18px 16px}.tag{display:inline-block;background:#dceaff;color:#1556a1;font-size:11px;font-weight:700;padding:3px 8px;border-radius:30px}.prompt-title{font-weight:800;color:var(--navy)}.prompt-controls{display:flex;gap:8px;align-items:center;margin-top:12px}button,.download{cursor:pointer;background:var(--blue);border:0;color:white;border-radius:8px;padding:10px 12px;font-weight:700;font-size:12px;text-decoration:none}button.secondary{background:#e8f0fd;color:#1654a3}button:hover{filter:brightness(.95)}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #e2a233;outline-offset:2px}.progress{height:11px;background:#e0e8f1;border-radius:9px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:#248760;border-radius:9px;transition:width .2s}.checkrow{display:flex;align-items:start;gap:11px;background:#fff;padding:11px;border-bottom:1px solid #e1e9f2}.checkrow input{margin-top:6px;transform:scale(1.18)}.dayrow input{margin-top:3px}.dayrow{display:flex;align-items:start;gap:8px}.dayrow label{font-weight:800;color:var(--navy)}.small{font-size:12px;color:var(--muted)}.meta{font-size:12px;color:#537299}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:15px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}.notes{width:100%;min-height:150px;border:1px solid #c9d5e6;border-radius:10px;padding:12px;font:14px/1.5 inherit;resize:vertical}.buttonrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px;margin-top:50px}.kbd{border:1px solid #c4ccda;background:#f8fafc;padding:1px 5px;border-radius:4px}.indexlink{font-weight:700}.notice{font-size:12px;color:#ddeaf9;margin-top:6px}.mono{font-family:Consolas,monospace}.printmeta{display:none}
+@media(max-width:950px){.layout{display:block}.sidebar{position:static;height:auto;padding:15px}.sidebar nav{display:flex;flex-wrap:wrap;gap:4px}.sidebar a{padding:5px 8px}.main{padding:18px}.hero{padding:22px}.hero h1{font-size:27px}.two-col{grid-template-columns:1fr}}
+@media print{ @page{size:A4;margin:16mm 16mm 17mm 16mm;@bottom-right{content:'SmartAttend build guide  •  ' counter(page);color:#718399;font-size:8pt}} body{background:#fff;color:#222;font:9.2pt/1.47 'DejaVu Sans',sans-serif}.layout{display:block}.sidebar,.no-print,button{display:none!important}.main{padding:0;max-width:none}.hero{background:#122b4d!important;border-radius:0;padding:20px;margin:0 0 20px}.hero h1{font-size:24pt}.hero p{font-size:10pt}.section-title{font-size:16pt;margin-top:16pt;page-break-after:avoid}.card{border:1px solid #d8e2ee;box-shadow:none;break-inside:avoid}section{margin-bottom:20pt}.prompt{break-inside:auto;border:1px solid #d8e2ee}.prompt summary{background:#f1f5fb;padding:10px}.prompt .body{padding:6px 13px 10px}.prompt pre{font:8.1pt/1.37 'DejaVu Sans Mono',monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f7fb!important;color:#152b46!important;border:1px solid #d4e0f0;page-break-inside:auto}table{font-size:8.3pt}th,td{padding:5px}.printmeta{display:block;color:#697b8f;font-size:8pt}.checkrow{padding:5px 7px}.checkrow input{transform:none}.notes{min-height:60px}.herogrid .pill{border-color:#afc5e9}.callout{border:1px solid #dae7f7;border-left:3px solid #1769e0;background:#eff5ff}.sidebar{display:none}.prompt summary{cursor:auto}a{color:#174b89;text-decoration:none}h2,h3,h4{break-after:avoid} .week-table, .tablewrap{break-inside:auto} }
+</style></head><body><div class="layout"><aside class="sidebar"><div class="brand">SmartAttend</div><div class="subbrand">CODEX BUILD HANDBOOK<br>Offline edition • Beginner friendly</div><nav><a href="#start">Read first</a><a href="#scope">Build scope</a><a href="#setup">First-time setup</a><a href="#roadmap">14-day roadmap</a><a href="#prompts">Codex prompts</a><a href="#firebase">Firebase setup</a><a href="#verify">Testing checklist</a><a href="#troubleshooting">Troubleshooting</a><a href="#backup">Backups &amp; notes</a><a href="#later">ESP32 later</a></nav><p class="notice">All instructions and prompts are saved in this file.</p></aside><main class="main"><header class="hero"><div class="eyebrow">Offline construction kit</div><h1>Build SmartAttend with Codex</h1><p>A self-contained, step-by-step Android application guide: project setup, prompts, Firebase, simulated attendance, teacher dashboard, testing and recovery.</p><div class="herogrid"><span class="pill">14-day schedule</span><span class="pill">No ESP32 needed now</span><span class="pill">Copyable Codex prompts</span><span class="pill">Offline HTML</span></div></header><section id="start"><h2 class="section-title">Read this first</h2><p class="intro">One self-contained guide for finishing SmartAttend even if the ChatGPT or Codex conversation disappears.</p>
+<div class="callout good"><strong>Your goal:</strong> A real, runnable Android app + Firebase student login + clearly labeled simulated attendance + a basic teacher web dashboard. ESP32 hardware is <strong>not required now</strong>. Do not describe a simulation as real physical attendance.</div>
+<div class="two-col"><div class="card"><h3>Study plan</h3><p><strong>14 days • 5–7 focused hours/day</strong><br>Beginner + AI-assisted. This is an aggressive demo deadline, not a guaranteed production delivery date.</p></div><div class="card"><h3>Preserve your work</h3><p>Keep Android source files locally, use Git checkpoints, update <code>PROJECT_STATUS.md</code>, and export checklist/notes from this HTML page.</p></div></div>
+<div class="card"><h3>What the supplied 11-page technical project guide specifies</h3><ul><li>One classroom, Android-only student app, three ESP32 BLE beacons, Firebase, and teacher/admin web dashboard.</li><li>Student app screens: Login/Registration, Home/Current Class, My Attendance, History, Profile.</li><li>Data: students, subjects, timetable, sessions, attendance, devices, audit logs.</li><li>Future BLE rule: multi-node RSSI measurements, stability/dwell time and exit timeout; classroom thresholds require real calibration.</li><li>Example attendance policy: at least 75% Present, 50–74% Review, below 50% Absent; late arrival is a separate flag.</li></ul><p class="small">This handbook adapts that source design to an app-first, hardware-free 14-day build. Added engineering recommendations (Git, source abstraction, security, tests) are implementation guidance rather than statements from the original guide.</p></div>
+</section>
+<section id="scope"><h2 class="section-title">Build scope and architecture</h2>
+<div class="card"><h3>Phase 1: no hardware</h3><p><strong>Student UI</strong> → <strong>Firebase login + timetable</strong> → <strong>SimulatedPresenceSource</strong> → <strong>attendance calculation</strong> → <strong>teacher dashboard</strong>.</p><p>Keep the source interface separate so <code>BlePresenceSource</code> can be added later. A teacher-controlled process should finalize official records; never trust arbitrary student-client writes as conclusive proof.</p></div>
+<div class="card"><h3>What you must NOT attempt during these 14 days</h3><p>No face recognition, AI prediction, exact indoor positioning, iOS, multiple classrooms, Play Store release, or real BLE scanning without hardware. Avoid unsupported claims of anti-proxy accuracy.</p></div>
+<h3>Tools and links</h3><table><tr><th>Tool</th><th>Purpose</th><th>Get it</th></tr>
+<tr><td>Android Studio</td><td>Create / run the Android app</td><td><a href="https://developer.android.com/studio">https://developer.android.com/studio</a></td></tr>
+<tr><td>Codex documentation</td><td>AI coding help and workspace guidance</td><td><a href="https://developers.openai.com/codex/">https://developers.openai.com/codex/</a></td></tr>
+<tr><td>Firebase Console</td><td>Authentication and Firestore</td><td><a href="https://console.firebase.google.com/">https://console.firebase.google.com/</a></td></tr>
+<tr><td>VS Code</td><td>Optional editor for teacher dashboard</td><td><a href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></td></tr>
+<tr><td>Git</td><td>Local source history and checkpoints</td><td><a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a></td></tr>
+<tr><td>GitHub</td><td>Optional off-device code backup</td><td><a href="https://github.com/">https://github.com/</a></td></tr>
+<tr><td>Arduino IDE (later)</td><td>ESP32 programming only after hardware arrives</td><td><a href="https://www.arduino.cc/en/software">https://www.arduino.cc/en/software</a></td></tr>
+</table>
+</section>
+<section id="setup"><h2 class="section-title">Part A — Start from zero on Windows</h2><p class="intro">Do these steps before asking Codex to make large code changes.</p>
+<div class="card"><h3>1. Install Android Studio</h3><p>Download from https://developer.android.com/studio, run the Windows installer, accept recommended SDK components, and wait for installation. A reasonably modern Windows laptop with enough disk space is needed.</p><div class="callout good"><strong>Verify:</strong> Android Studio opens to its welcome screen.</div></div>
+<div class="card"><h3>2. Create an Android project</h3><p>Choose New Project &gt; Empty Activity (Kotlin + Compose template). Name: SmartAttend. Package: com.smartattend.app. Minimum SDK: API 26. Save in C:\Projects\SmartAttend (or a folder you can find). Finish and wait for Gradle sync.</p><div class="callout good"><strong>Verify:</strong> MainActivity.kt and app/build.gradle.kts are present.</div></div>
+<div class="card"><h3>3. Run the untouched starter app</h3><p>Connect an Android phone with USB debugging enabled; accept its debugging prompt. Or create an emulator in Android Studio Device Manager. Select device and press Run (green triangle).</p><div class="callout good"><strong>Verify:</strong> The starter screen opens on the phone/emulator.</div></div>
+<div class="card"><h3>4. Open the SAME folder in Codex</h3><p>Desktop app: open/select the SmartAttend project folder. VS Code extension: File &gt; Open Folder, choose SmartAttend, then open Codex. Codex web: connect a GitHub repository first; local instructions differ. Do not create a second unrelated project.</p><div class="callout good"><strong>Verify:</strong> Codex can inspect MainActivity.kt in the same folder Android Studio uses.</div></div>
+<div class="card"><h3>5. Run Prompt P0</h3><p>Copy and paste P0 below into Codex. Permit only changes you understand. Ask Codex to tell you exactly what changed and whether Gradle actually built.</p><div class="callout good"><strong>Verify:</strong> AGENTS.md, PROJECT_STATUS.md, PROJECT_PLAN.md exist and build result is known.</div></div>
+<div class="card"><h3>6. Save your first Git checkpoint</h3><p>In the project folder, initialize Git if needed and commit a first working state. Inspect .gitignore, especially local.properties, signing files, service credentials. Keep a second backup outside the laptop if possible.</p><div class="callout good"><strong>Verify:</strong> You can recover the working starter project even if later code fails.</div></div>
+<div class="callout warn"><strong>Codex interface matters.</strong> Desktop app or editor extension can usually work with the local folder directly. Codex web typically uses a connected repository. The key rule: Codex and Android Studio must refer to the SAME project, not separate copies.</div>
+<h3>Windows build and checkpoint commands</h3><p>Open the terminal in the <strong>SmartAttend project root</strong> (where <code>gradlew.bat</code> exists):</p><pre>.\gradlew.bat assembleDebug</pre><p>After a successful debug build, the APK is usually at <code>app\build\outputs\apk\debug\app-debug.apk</code>. For version control, install Git and then use:</p><pre>git init
+git status
+git add .
+git commit -m "SmartAttend starter project"</pre><p class="small">Check <code>.gitignore</code> before adding files. Never commit passwords, private signing keys or service-account private keys. If Git asks for your identity, configure your name and email first.</p>
+</section>
+<section id="roadmap"><h2 class="section-title">Part B — Daily 14-day checklist</h2><p class="intro">Check a day only after its verification condition is true. Progress is stored in this browser and can be exported.</p>
+<div class="card no-print"><div class="topbar"><strong id="count">0 / 14 days complete</strong><button class="secondary" onclick="document.querySelector('#backup').scrollIntoView({behavior:'smooth'})">Back up my progress</button></div><div class="progress" style="margin-top:10px"><i id="progress-bar"></i></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 1" data-group="days" value="1" type="checkbox"/><div><label>Day 1 — Set up the project</label><p>Install Android Studio, create the Kotlin/Compose project, open the same folder in Codex, run the untouched starter app.</p><div class="callout good"><strong>Done when:</strong> Starter app opens on Android phone or emulator.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 2" data-group="days" value="2" type="checkbox"/><div><label>Day 2 — Make a safe starting point</label><p>Ask Codex to inspect files, write AGENTS.md and PROJECT_STATUS.md, run a build, and set up Git backup.</p><div class="callout good"><strong>Done when:</strong> Build succeeds and Git has a first checkpoint.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 3" data-group="days" value="3" type="checkbox"/><div><label>Day 3 — Create the student interface</label><p>Implement the login UI and Home screen with clearly labeled demo data.</p><div class="callout good"><strong>Done when:</strong> App launches with functional login demo and Home screen.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 4" data-group="days" value="4" type="checkbox"/><div><label>Day 4 — Add navigation and screens</label><p>Implement My Attendance, History, Timetable, Profile, and bottom navigation.</p><div class="callout good"><strong>Done when:</strong> All screens open without crashing.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 5" data-group="days" value="5" type="checkbox"/><div><label>Day 5 — Model local data</label><p>Create mock students, subjects, sessions and records; add empty/loading/error UI states.</p><div class="callout good"><strong>Done when:</strong> UI changes correctly when the mock data changes.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 6" data-group="days" value="6" type="checkbox"/><div><label>Day 6 — Prepare Firebase manually</label><p>Create Firebase project, Android app registration, auth, Firestore, and place google-services.json.</p><div class="callout good"><strong>Done when:</strong> Firebase configuration present; no credentials committed.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 7" data-group="days" value="7" type="checkbox"/><div><label>Day 7 — Integrate student sign-in</label><p>Have Codex connect Firebase Authentication, profiles and safe student-only reads.</p><div class="callout good"><strong>Done when:</strong> Test user signs in and accesses only own profile.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 8" data-group="days" value="8" type="checkbox"/><div><label>Day 8 — Add timetable and sessions</label><p>Store timetable, enrollment, and active session records; handle no-class and wrong-batch cases.</p><div class="callout good"><strong>Done when:</strong> App shows correct active class or rejection.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 9" data-group="days" value="9" type="checkbox"/><div><label>Day 9 — Build attendance simulation</label><p>Create SimulatedPresenceSource, entry/exit controls, time clock and percentage calculation.</p><div class="callout good"><strong>Done when:</strong> Simulated presence works and is visibly labeled DEMO.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 10" data-group="days" value="10" type="checkbox"/><div><label>Day 10 — Test attendance logic</label><p>Unit-test boundary cases, repeated entry, early exit, late arrival, wrong batch and session end.</p><div class="callout good"><strong>Done when:</strong> Critical tests pass; no duplicate time counting.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 11" data-group="days" value="11" type="checkbox"/><div><label>Day 11 — Create teacher web dashboard</label><p>Build basic teacher sign-in, sessions table, and live attendance list in dashboard/ folder.</p><div class="callout good"><strong>Done when:</strong> Teacher can sign in and view a class.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 12" data-group="days" value="12" type="checkbox"/><div><label>Day 12 — Secure teacher actions and export</label><p>Add controlled start/end class, corrections with audit log and basic CSV export.</p><div class="callout good"><strong>Done when:</strong> Teacher workflow works; students cannot edit final results.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 13" data-group="days" value="13" type="checkbox"/><div><label>Day 13 — Run the full demo and fix errors</label><p>Demonstrate teacher start -&gt; demo entry -&gt; exit -&gt; calculated record -&gt; teacher view.</p><div class="callout good"><strong>Done when:</strong> End-to-end walkthrough succeeds with two accounts.</div></div></div></div>
+<div class="card"><div class="dayrow"><input aria-label="Complete day 14" data-group="days" value="14" type="checkbox"/><div><label>Day 14 — Produce the APK and submission pack</label><p>Generate debug APK; save source ZIP, README, screenshots, limits, test notes and viva points.</p><div class="callout good"><strong>Done when:</strong> APK, source backup, test evidence and presentation ready.</div></div></div></div>
+</section>
+<section id="prompts"><h2 class="section-title">Part C — Full copy/paste Codex prompts</h2><p class="intro">Paste ONE prompt at a time. Test and save a checkpoint before moving to the next prompt. They are ordered to match your 14-day plan.</p>
+<details class="prompt" open id="p0"><summary><span class="tag">P0</span> <span class="prompt-title">Codex project rules / first inspection</span> <span class="meta">Day 1–2</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p0">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p0">You are the lead engineer and beginner-friendly instructor for SmartAttend, my final-year project.
+
+CONTEXT
+- I am a complete beginner with 14 days.
+- I have a valid Android Studio Kotlin + Jetpack Compose project open in this workspace.
+- I do NOT have ESP32 hardware yet.
+- Ultimate design: 3 ESP32 BLE beacons -&gt; Android student app -&gt; Firebase -&gt; teacher web dashboard.
+- Today is only project inspection and safe planning.
+
+TASKS
+1. Inspect the existing project and report the module, Kotlin/Gradle/SDK setup and existing files.
+2. Do not delete, recreate or overwrite a functioning Android project.
+3. Create AGENTS.md with rules: work one milestone at a time; preserve working features; use maintainable beginner-friendly code; don&#x27;t pretend unrun tests passed; label simulated data; never expose secrets; prefer incremental fixes.
+4. Create PROJECT_STATUS.md with Completed, Current task, Tests run, Known issues, Next action.
+5. Create PROJECT_PLAN.md for Android UI, Firebase, simulated attendance, teacher dashboard, QA, then future BLE.
+6. Recommend a simple PresenceSource interface that can later have SimulatedPresenceSource and BlePresenceSource implementations; do not implement BLE now.
+7. Run the existing debug build if tools allow; tell me the exact command and result.
+8. Explain in simple terms what I should do manually.
+
+STOP after inspection/planning. Report files changed, verified results, blockers and the next tiny step.</pre></div></details>
+<details class="prompt" open id="p1"><summary><span class="tag">P1</span> <span class="prompt-title">First student screen + working app</span> <span class="meta">Day 3</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p1">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p1">Build the first real SmartAttend Android screen in this existing Kotlin/Jetpack Compose project.
+
+GOAL
+A polished student demo login and Home screen that compiles and runs. Use Material 3.
+
+STYLE
+Primary #1769E0; navy #123563; white/light gray; good contrast; simple rounded cards; clean college-app design. Avoid excessive animation.
+
+FUNCTIONS
+- Demo Login with student ID or email and password fields; show DEMO MODE prominently.
+- Use local fake student data for now; do not claim this is secure authentication.
+- Home shows student&#x27;s name, current lecture card, room, session status, and example attendance overview.
+- Show loading/empty state where relevant.
+
+REQUIREMENTS
+- Do not add Firebase or Bluetooth yet.
+- Make code changes directly in this workspace, do not only print snippets.
+- Keep code small, understandable and easily testable.
+- Explain exact files changed and how I run the app.
+- Run a Gradle debug build if possible; if not, explain what couldn&#x27;t be tested.
+- Update PROJECT_STATUS.md and stop.</pre></div></details>
+<details class="prompt" open id="p2"><summary><span class="tag">P2</span> <span class="prompt-title">Navigation and five student screens</span> <span class="meta">Days 4–5</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p2">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p2">Extend SmartAttend using the existing Kotlin/Jetpack Compose project.
+
+IMPLEMENT THESE STUDENT SCREENS
+1. Home/Current Class: lecture, room, class time, detection status.
+2. My Attendance: subject-wise attended/total classes, percentages and shortage warning.
+3. History: date, subject, Present/Late/Review/Absent status.
+4. Timetable: today&#x27;s scheduled lectures and active session indicator.
+5. Profile: student name, roll number, department, batch and future device placeholder.
+
+Add functional navigation, consistent styles, local sample-data repository and helpful empty/error UI. Demo data must be visibly labeled.
+
+Do not add Firebase or BLE. Do not accidentally break the working login screen.
+Run build checks, explain exactly how to tap through every screen, update PROJECT_STATUS.md, stop.</pre></div></details>
+<details class="prompt" open id="p3"><summary><span class="tag">P3</span> <span class="prompt-title">Firebase readiness and rules planning</span> <span class="meta">Day 6</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p3">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p3">Prepare the existing SmartAttend Android app for Firebase integration, but do not invent credentials or assume I have finished Firebase Console setup.
+
+First inspect Gradle files and check whether app/google-services.json exists.
+
+I will manually create the Firebase project, register Android package com.smartattend.app, download google-services.json, enable email/password authentication, and create Firestore.
+
+TASKS
+- Tell me which Firebase Console steps are still missing.
+- Add compatible Firebase Android plugins/dependencies only when configuration is present or when it is safe to do so.
+- Use currently supported Firebase SDK artifacts and the BoM; avoid obsolete KTX artifacts.
+- Prepare a concise data model for users, subjects, enrollments, timetable, sessions, presenceEvents, attendance and auditLogs.
+- Draft deny-by-default security rules: student only own data; no student write to finalized attendance; teacher-only authorized operations; no self-assignment of role.
+- Explain a safe way to manually bootstrap the first teacher account in Firebase Console.
+- Do not put passwords or service-account private keys in source code.
+- Run available build checks, update PROJECT_STATUS.md and stop.</pre></div></details>
+<details class="prompt" open id="p4"><summary><span class="tag">P4</span> <span class="prompt-title">Firebase student login and profile</span> <span class="meta">Day 7</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p4">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p4">Connect SmartAttend to the Firebase project already configured in this workspace.
+
+IMPLEMENT
+- Email/password student authentication with Firebase Authentication.
+- Login/logout and persistent signed-in state.
+- Firestore profile reads tied to Firebase Auth UID.
+- Loading, success, no-profile, and meaningful error states.
+- Students must not read another student&#x27;s profile or attendance.
+- Keep a clearly separated mock/demo data mode for offline UI work.
+
+SECURITY
+- Do not let users choose their own teacher/admin role.
+- Include/adjust Firestore rules and a clear console deployment checklist.
+- Do not allow student writes to final attendance records.
+- Explain any required manual Firestore test-user and profile setup.
+
+Keep the app building, add appropriate tests if practical, update PROJECT_STATUS.md, and tell me how to verify using two test student accounts. Stop after this milestone.</pre></div></details>
+<details class="prompt" open id="p5"><summary><span class="tag">P5</span> <span class="prompt-title">Timetable and active class validation</span> <span class="meta">Day 8</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p5">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p5">Implement the data and app logic for SmartAttend active class sessions.
+
+Data concepts: student, batch/enrollment, subject, room, timetable, teacher, session start/end, session status.
+
+FEATURES
+- Show today&#x27;s timetable and the current active class on Home.
+- Check whether signed-in student is enrolled in the active batch/subject.
+- Distinguish No class, Upcoming class, Active eligible class and Active ineligible class.
+- Do not create any attendance record from merely opening the app.
+- Use consistent UTC timestamps for storage and display campus-local times clearly.
+- Validate user/session relationships with appropriate Firestore rules or trusted teacher-controlled records.
+- Provide test sample records with instructions for entering them safely.
+
+Do not implement real BLE scanning. Run tests/build, explain the verification steps and update PROJECT_STATUS.md. Stop.</pre></div></details>
+<details class="prompt" open id="p6"><summary><span class="tag">P6</span> <span class="prompt-title">Simulated attendance engine</span> <span class="meta">Days 9–10</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p6">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p6">Implement a clearly labeled SIMULATION ONLY attendance engine in the existing SmartAttend Android app. I do not own any ESP32 boards yet.
+
+ARCHITECTURE
+- PresenceSource abstraction that emits presence state/events.
+- SimulatedPresenceSource with manual Enter Classroom and Exit Classroom buttons.
+- Keep a future BlePresenceSource placeholder/integration note separate; no fake BLE readings.
+- AttendanceCalculator and a testable clock abstraction.
+
+LOGIC
+1. Require a signed-in student who is enrolled in an active subject/batch/session.
+2. On demo Enter, record event and start accumulating duration.
+3. On demo Exit, close the current interval.
+4. Re-entry continues accumulating time without duplicate counting.
+5. At session end, close any open interval and compute percentage = confirmed minutes / scheduled or configured lecture minutes * 100.
+6. Example policy: &gt;=75% Present, 50% to &lt;75% Review, &lt;50% Absent. Track Late separately using a configurable grace period.
+7. Reject inactive/wrong-batch/duplicate events.
+8. Use a controllable fake clock for fast testing without waiting an hour.
+9. Label ALL simulated records and screens DEMO / NOT VERIFIED BY BLE.
+10. Separate untrusted student-reported presence evidence from teacher-authorized final records.
+
+TESTS
+100%, 75%, 74.9%, 50%, 49.9%, re-entry, repeat enter/exit, late arrival, early exit, wrong enrollment, inactive session, session end with open interval.
+
+Do not claim proxy prevention or secure physical presence. Run real tests/build where possible; update PROJECT_STATUS.md and stop.</pre></div></details>
+<details class="prompt" open id="p7"><summary><span class="tag">P7</span> <span class="prompt-title">Teacher dashboard</span> <span class="meta">Days 11–12</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p7">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p7">Build a basic SmartAttend teacher/admin web dashboard in the existing repository folder teacher-dashboard/ using HTML, CSS, JavaScript and Firebase Web SDK.
+
+REQUIREMENTS
+- Reuse the app&#x27;s existing Firestore collection names and document structure.
+- Teacher sign-in via Firebase Auth.
+- Responsive clean navy/blue UI.
+- Today&#x27;s timetable and class sessions.
+- Start/stop a class session where the authenticated account is authorized.
+- Live attendance/demo evidence table.
+- Finalized attendance table with Present/Late/Review/Absent.
+- Teacher correction requires written reason and writes an audit record.
+- CSV export for class attendance.
+
+SECURITY
+- Teacher roles must be assigned outside student self-service.
+- Enforce rights in Firestore rules/trusted backend, not only by hiding buttons.
+- Prevent students from directly setting attendance statuses or teacher permissions.
+- Never embed service-account private keys.
+- Clearly indicate demo/simulated presence.
+
+Scope: one classroom, one teacher, a few demo student accounts. No complex analytics or production deployment.
+
+Tell me exactly how to run the web dashboard locally, finish required Firebase console steps, test teacher vs student permissions, and run/build checks. Update PROJECT_STATUS.md and stop.</pre></div></details>
+<details class="prompt" open id="p8"><summary><span class="tag">P8</span> <span class="prompt-title">End-to-end demo rehearsal</span> <span class="meta">Day 13</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p8">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p8">Audit and test the existing SmartAttend prototype end to end. Do not start redesigning the UI.
+
+DEMO FLOW
+1. Teacher signs in and starts a class.
+2. Eligible student signs in.
+3. Student sees active eligible session.
+4. Student explicitly uses SIMULATED entry and exit.
+5. App computes presence duration and percentage.
+6. Authorized teacher sees evidence and final attendance result.
+7. Teacher makes a justified correction and audit log records the action.
+8. Student sees updated finalized status.
+
+NEGATIVE CASES
+- Wrong-batch student
+- Inactive session
+- Student tries to edit own finalized attendance
+- Student attempts teacher operation
+- Double entry and repeated exit
+- Internet unavailable or Firestore operation fails
+
+For each test report PASS, FAIL or NOT RUN and include evidence (command/result or human manual verification needed). Fix only confirmed bugs. Update PROJECT_STATUS.md and write TEST_REPORT.md. Stop.</pre></div></details>
+<details class="prompt" open id="p9"><summary><span class="tag">P9</span> <span class="prompt-title">APK, backup, documentation and viva</span> <span class="meta">Day 14</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p9">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p9">Prepare this SmartAttend repository for final-year college demonstration.
+
+DELIVERABLES
+1. Verify Gradle assembleDebug, provide precise APK path only if generated.
+2. Write README.md: project purpose, architecture, stack, Windows setup, run steps, how DEMO mode works, Firebase setup, teacher dashboard launch.
+3. Write TEST_REPORT.md with actual results, unrun tests and limitations.
+4. Write DEMO_SCRIPT.md with a 5-minute walkthrough.
+5. Write VIVA_NOTES.md with BLE/RSSI, why 3 ESP32 nodes, Firebase, presence duration, security and limitations.
+6. Include notes on how to add real ESP32 hardware later.
+7. Produce a list of files to back up and any environment-specific files that need reconfiguration.
+8. Update PROJECT_STATUS.md so a new Codex chat can resume.
+
+Do not claim real BLE, GPS accuracy, fraud-proof attendance or full production security. Run checks and list exact success/failure. Stop.</pre></div></details>
+<details class="prompt" open id="p10"><summary><span class="tag">P10</span> <span class="prompt-title">Fix an error without damaging the app</span> <span class="meta">Whenever something breaks</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p10">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p10">You are fixing an error in my existing SmartAttend repository. I am a programming beginner.
+
+ERROR / SYMPTOM:
+[PASTE THE FULL ERROR OR DESCRIBE WHAT HAPPENED]
+
+WHAT I DID BEFORE IT FAILED:
+[EXPLAIN LAST STEP]
+
+TASK
+1. Inspect the related source and build files before changing anything.
+2. Explain the cause simply.
+3. Apply the smallest safe change that addresses the observed error.
+4. Avoid rewriting working screens or architecture.
+5. Run the relevant build/test if available; be honest about what was not run.
+6. Report which files changed and how I can verify the fix.
+7. Update PROJECT_STATUS.md.
+
+Do not add unrelated new features.</pre></div></details>
+<details class="prompt" open id="p11"><summary><span class="tag">P11</span> <span class="prompt-title">Resume development in a fresh Codex chat</span> <span class="meta">Use if browser/Codex session disappears</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p11">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p11">We are resuming SmartAttend after losing prior chat context. Do not assume anything from memory.
+
+PROJECT:
+Android Kotlin/Jetpack Compose, Firebase, a separate teacher dashboard, simulated attendance only for now. No ESP32 boards yet.
+
+FIRST ACTIONS
+1. Read AGENTS.md, PROJECT_STATUS.md, PROJECT_PLAN.md and README.md if available.
+2. Inspect Git status and the relevant current files.
+3. Tell me what already works, which tests were actually run, unresolved errors and the most important next milestone.
+4. Do NOT restart the project, change dependencies without reason, or recreate features already working.
+5. Suggest ONE small next coding task and ask for my approval before editing.
+
+Keep every response beginner-friendly and update PROJECT_STATUS.md after work.</pre></div></details>
+<details class="prompt" open id="p12"><summary><span class="tag">P12</span> <span class="prompt-title">Later: connect actual ESP32 BLE boards</span> <span class="meta">Only after buying hardware</span></summary><div class="body"><div class="prompt-controls no-print"><button data-copy="prompt-p12">Copy prompt</button><span class="small">Paste into Codex with your project open</span></div><pre id="prompt-p12">SmartAttend already has a tested simulated PresenceSource. Now integrate 3 physical ESP32 BLE beacons without rewriting other attendance logic.
+
+FIRST: inspect existing code, ask for exact ESP32 board model and Android phone version.
+
+THEN IN SMALL STEPS:
+1. Provide compatible Arduino ESP32 BLE beacon code for one node, with unique classroom/node identifiers.
+2. Help me flash and detect one ESP32 via a phone scanner.
+3. Build the Android BLE scanning source with Android-version-appropriate permissions and lifecycle handling.
+4. Show RSSI from one node, then all three.
+5. Add filtering, an initial configurable 2-of-3 consistency/dwell rule, and a signal-loss timeout.
+6. Calibrate inside seats, outside walls, doorway and corridor with multiple phones.
+7. Replace demo PresenceSource only in an explicitly selected real-hardware mode.
+8. Preserve demo mode for troubleshooting, and never label it hardware verified.
+9. Document background scanning restrictions, device variability, spoofing risk and absence of exact indoor location.
+10. Test, record measured results and keep teacher correction path.
+
+Do not claim perfect anti-proxy, exact triangulation or secure presence solely from RSSI. Start with inspecting the current repository and giving me the first physical setup step, not a huge rewrite.</pre></div></details>
+</section>
+<section id="firebase"><h2 class="section-title">Part D — Firebase manual checklist</h2><p class="intro">These steps are performed in your own Firebase Console. Codex can write code, but it cannot invent your cloud configuration.</p>
+<ol><li>Open <a href="https://console.firebase.google.com/">console.firebase.google.com</a> and create a Firebase project named SmartAttend.</li><li>Add an Android app with <code>com.smartattend.app</code> (must exactly match your app ID).</li><li>Download <code>google-services.json</code> and put it inside <code>SmartAttend/app/</code>.</li><li>Enable Email/Password in Authentication → Sign-in method.</li><li>In Cloud Firestore, create the database in a suitable region. Deploy restrictive security rules; do not leave a public test database.</li><li>Create at least two student test accounts and one teacher test account. Teacher permissions must be assigned by a trusted admin, never through an ordinary student registration form.</li><li>Use the Firebase Android setup guide to check compatible plugins and SDK modules. Do not put a service-account JSON key in the Android or web app.</li><li>Use P3 and P4 for integration, test separate identities, and verify that students cannot edit finalized records.</li></ol>
+<div class="callout warn"><strong>Security limitation:</strong> BLE presence data sent by a student's phone is untrusted client input. This demo should never be represented as tamper-proof official attendance. Classroom policy and backend validation are required for a real deployment.</div>
+</section>
+<section id="verify"><h2 class="section-title">Part E — Final acceptance checklist</h2><p class="intro">Use actual test outcomes, not guesses. Mark only what you have personally verified.</p>
+<label class="checkrow"><input data-group="checks" value="0" type="checkbox"/><span>Starter Kotlin app builds and launches</span></label>
+<label class="checkrow"><input data-group="checks" value="1" type="checkbox"/><span>Demo login and student navigation work</span></label>
+<label class="checkrow"><input data-group="checks" value="2" type="checkbox"/><span>All mock screens clearly show demo data</span></label>
+<label class="checkrow"><input data-group="checks" value="3" type="checkbox"/><span>Firebase student login works and logout works</span></label>
+<label class="checkrow"><input data-group="checks" value="4" type="checkbox"/><span>Another student cannot view private profile data</span></label>
+<label class="checkrow"><input data-group="checks" value="5" type="checkbox"/><span>Timetable correctly shows an active class</span></label>
+<label class="checkrow"><input data-group="checks" value="6" type="checkbox"/><span>Wrong-batch student is denied attendance flow</span></label>
+<label class="checkrow"><input data-group="checks" value="7" type="checkbox"/><span>Simulated Enter and Exit controls work</span></label>
+<label class="checkrow"><input data-group="checks" value="8" type="checkbox"/><span>No double-counted minutes or duplicate results</span></label>
+<label class="checkrow"><input data-group="checks" value="9" type="checkbox"/><span>75%, 50% and below-50% boundary rules are tested</span></label>
+<label class="checkrow"><input data-group="checks" value="10" type="checkbox"/><span>Teacher starts and ends a session</span></label>
+<label class="checkrow"><input data-group="checks" value="11" type="checkbox"/><span>Teacher can view attendance and correct with audit reason</span></label>
+<label class="checkrow"><input data-group="checks" value="12" type="checkbox"/><span>Student cannot edit a finalized attendance status</span></label>
+<label class="checkrow"><input data-group="checks" value="13" type="checkbox"/><span>End-to-end demo works with test accounts</span></label>
+<label class="checkrow"><input data-group="checks" value="14" type="checkbox"/><span>Debug APK generated and source backed up</span></label>
+<label class="checkrow"><input data-group="checks" value="15" type="checkbox"/><span>Known limitations and future BLE phase documented</span></label>
+<h3>Practice a 5-minute viva demonstration</h3><ol><li>Say the problem: one-time check-ins do not prove continued presence.</li><li>Show the student screens and Firebase login.</li><li>Start a session as teacher in the web dashboard.</li><li>Simulate a student's entry and exit, calculate attendance, show it on dashboard.</li><li>Demonstrate wrong-batch rejection and teacher correction audit log.</li><li>State clearly: ESP32 integration is future phase; simulated signals are NOT live BLE.</li><li>Explain expected multi-node BLE behavior and its main limitation: RSSI variation and wall penetration.</li></ol>
+</section>
+<section id="troubleshooting"><h2 class="section-title">Part F — Troubleshooting and recovery</h2><p class="intro">For any coding issue, give Codex the full error and paste P10. Do not ask it to rewrite everything.</p>
+<div class="card"><h3>Codex says it cannot find project files</h3><p>It is likely working in the wrong folder. In Android Studio use File &gt; Open to locate the project; then open that exact directory in Codex. Check that settings.gradle.kts is visible.</p></div>
+<div class="card"><h3>Gradle sync or build fails</h3><p>Copy the full first error, including lines above it, and use Prompt P10. Check internet connectivity for downloading dependencies, installed SDK, JDK configuration and Gradle compatibility. Do not blindly replace version numbers.</p></div>
+<div class="card"><h3>App does not appear on phone</h3><p>Enable Developer Options and USB Debugging, confirm phone authorizes this PC, try a data-capable USB cable, select the actual device and hit Run. Alternatively use an emulator.</p></div>
+<div class="card"><h3>The app looks good but nothing changes</h3><p>Check whether you are using demo/mock data. Verify buttons have real callbacks, view models observe state, and there is no hardcoded UI-only fake logic.</p></div>
+<div class="card"><h3>Firebase login fails</h3><p>Check email/password provider enabled, the user exists, network is working, google-services.json matches your package/project, and the full Firebase error code. Never share passwords in prompts.</p></div>
+<div class="card"><h3>Firestore permission denied</h3><p>Likely security rules or document UID mismatch. Do not change rules to allow read/write for everyone; inspect Auth UID, document paths and intended roles.</p></div>
+<div class="card"><h3>Teacher has no access</h3><p>Check the teacher account has been granted a trusted role by an administrator; never add a client-side “make me teacher” button.</p></div>
+<div class="card"><h3>Simulated attendance duplicates minutes</h3><p>Check overlapping intervals, repeated Enter events and session-end closure. Use test clock and unit tests; run Prompt P6/P10.</p></div>
+<div class="card"><h3>App lost after browser tab closed</h3><p>Local files remain in your project folder, and this guide stays available offline. Open the same folder, then paste P11 into a new Codex chat.</p></div>
+<div class="card"><h3>Need to pause a project for a day</h3><p>Ask Codex to update PROJECT_STATUS.md and commit or back up files. Export progress/notes from the HTML handbook as a separate .json backup.</p></div>
+<div class="card"><h3>Minimal recovery checklist after a lost chat</h3><ol><li>Find your local <code>SmartAttend</code> project folder.</li><li>Open it in Android Studio and in Codex.</li><li>Open <code>PROJECT_STATUS.md</code> to see the current milestone.</li><li>Run <code>.\gradlew.bat assembleDebug</code> or the Android Studio Build action.</li><li>Paste P11 into a fresh Codex chat.</li><li>Restore progress notes from a JSON export below, if needed.</li></ol></div>
+</section>
+<section id="backup"><h2 class="section-title">Part G — Save progress and protect your files</h2><p class="intro">The HTML works offline, including the checklist and prompts. Progress is saved to this browser unless you export it.</p>
+<div class="card"><h3>Project notes — edit anytime</h3><p class="small">Write your most recent Codex result, blockers, Firebase project status, last Git commit, and the next action. Notes are stored locally on this browser.</p><textarea id="progress-notes" class="notes" placeholder="Example: Day 3 done. App runs on emulator. Git commit abc123. Firebase not created yet. Next: P2 navigation."></textarea><div class="buttonrow no-print"><button id="save-backup">Download my progress (.json)</button><label class="download" for="load-backup" style="display:inline-block">Restore progress (.json)</label><input id="load-backup" type="file" accept="application/json,.json" style="display:none"/><button class="secondary" id="print-guide">Print / Save as PDF</button></div><p class="small">Export after each study session. Local browser storage can disappear if your browser data is cleared or you move to another computer.</p></div>
+<div class="callout good"><strong>Minimum offline backup folder:</strong> keep (1) the SmartAttend source directory or Git repository, (2) this HTML guide, (3) the PDF guide, (4) <code>PROJECT_STATUS.md</code>, (5) your exported progress JSON, and (6) a copy of the debug APK after it exists. Store the backup in cloud storage or an external drive too.</div>
+</section>
+<section id="later"><h2 class="section-title">Part H — Connecting ESP32 later</h2><p class="intro">This is Phase 2 after the app-only demo is working and you obtain three compatible BLE ESP32 boards.</p>
+<ol><li>Program and verify one ESP32 BLE advertiser using Arduino IDE.</li><li>Use an Android BLE scanner to confirm the identifier and RSSI.</li><li>Implement <code>BlePresenceSource</code> for Android with the correct permissions.</li><li>Add the remaining two beacons and record separate node RSSI values.</li><li>Use filtering and initial two-of-three stable presence logic with dwell/exit timeout; calibrate at front/back seats, door, corridor and behind walls.</li><li>Record measured false-positive and false-negative rates; do not claim exact indoor triangulation.</li><li>Test background behavior on your phone with battery optimization and Android foreground-service limitations in mind.</li><li>Maintain teacher corrections and document proxy-phone, spoofing and client-trust limitations.</li></ol><p>When the hardware arrives, use prompt P12. The source guide gives illustrative 10–15-second confirmation windows and example RSSI values, but they are <strong>not</strong> universal thresholds.</p>
+</section>
+<div class="footer"><strong>SmartAttend app-first recovery handbook</strong><br>Based on the user-supplied 11-page SmartAttend Complete Technical Project Guide, adapted to an Android-first, no-hardware, 14-day beginner development plan. All sample records and mockups must be labeled DEMO. This HTML is self-contained and works offline; the external links require internet.</div></main></div><script>
+(function(){
+ const key='smartattend-guide-v1';
+ let state={days:[],checks:[],notes:''};
+ try{const obj=JSON.parse(localStorage.getItem(key)||'null');if(obj && typeof obj==='object'){state={...state,...obj};}}catch(e){}
+ const ids=['days','checks'];
+ ids.forEach(group=>{document.querySelectorAll(`input[data-group="${group}"]`).forEach(el=>{el.checked=(state[group]||[]).includes(el.value);el.addEventListener('change',()=>{state[group]=Array.from(document.querySelectorAll(`input[data-group="${group}"]:checked`)).map(x=>x.value);save();});});});
+ const notes=document.getElementById('progress-notes'); notes.value=state.notes||''; notes.addEventListener('input',()=>{state.notes=notes.value;save();});
+ function save(){try{localStorage.setItem(key,JSON.stringify(state));}catch(e){}update();}
+ function update(){const n=(state.days||[]).length;document.getElementById('count').textContent=n+' / 14 days complete';document.getElementById('progress-bar').style.width=(100*n/14)+'%';}
+ update();
+ document.querySelectorAll('button[data-copy]').forEach(btn=>btn.addEventListener('click',async()=>{let el=document.getElementById(btn.dataset.copy);if(!el)return;let txt=el.innerText||el.textContent;try{await navigator.clipboard.writeText(txt);btn.textContent='Copied';setTimeout(()=>btn.textContent='Copy prompt',1700);}catch(e){let rng=document.createRange();rng.selectNodeContents(el);window.getSelection().removeAllRanges();window.getSelection().addRange(rng);btn.textContent='Select text and press Ctrl+C';}}));
+ document.getElementById('save-backup').addEventListener('click',()=>{let blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='smartattend_my_progress.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},200);});
+ document.getElementById('load-backup').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;let reader=new FileReader();reader.onload=()=>{try{let x=JSON.parse(reader.result);if(!Array.isArray(x.days)||!Array.isArray(x.checks))throw Error('Invalid format');state={days:x.days,checks:x.checks,notes:typeof x.notes==='string'?x.notes:''};save();location.reload();}catch(ex){alert('Could not read progress file. Please select a SmartAttend progress JSON backup.');}};reader.readAsText(f);});
+ document.getElementById('print-guide').addEventListener('click',()=>window.print());
+})();
+</script></body></html>

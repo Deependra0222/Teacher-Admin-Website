@@ -1,0 +1,271 @@
+SMARTATTEND - CODEX PROMPT PACK
+===============================================
+
+[P0] Codex project rules / first inspection (Day 1–2)
+-----------------------------------------------------------------
+You are the lead engineer and beginner-friendly instructor for SmartAttend, my final-year project.
+
+CONTEXT
+- I am a complete beginner with 14 days.
+- I have a valid Android Studio Kotlin + Jetpack Compose project open in this workspace.
+- I do NOT have ESP32 hardware yet.
+- Ultimate design: 3 ESP32 BLE beacons -> Android student app -> Firebase -> teacher web dashboard.
+- Today is only project inspection and safe planning.
+
+TASKS
+1. Inspect the existing project and report the module, Kotlin/Gradle/SDK setup and existing files.
+2. Do not delete, recreate or overwrite a functioning Android project.
+3. Create AGENTS.md with rules: work one milestone at a time; preserve working features; use maintainable beginner-friendly code; don't pretend unrun tests passed; label simulated data; never expose secrets; prefer incremental fixes.
+4. Create PROJECT_STATUS.md with Completed, Current task, Tests run, Known issues, Next action.
+5. Create PROJECT_PLAN.md for Android UI, Firebase, simulated attendance, teacher dashboard, QA, then future BLE.
+6. Recommend a simple PresenceSource interface that can later have SimulatedPresenceSource and BlePresenceSource implementations; do not implement BLE now.
+7. Run the existing debug build if tools allow; tell me the exact command and result.
+8. Explain in simple terms what I should do manually.
+
+STOP after inspection/planning. Report files changed, verified results, blockers and the next tiny step.
+
+[P1] First student screen + working app (Day 3)
+-----------------------------------------------------------------
+Build the first real SmartAttend Android screen in this existing Kotlin/Jetpack Compose project.
+
+GOAL
+A polished student demo login and Home screen that compiles and runs. Use Material 3.
+
+STYLE
+Primary #1769E0; navy #123563; white/light gray; good contrast; simple rounded cards; clean college-app design. Avoid excessive animation.
+
+FUNCTIONS
+- Demo Login with student ID or email and password fields; show DEMO MODE prominently.
+- Use local fake student data for now; do not claim this is secure authentication.
+- Home shows student's name, current lecture card, room, session status, and example attendance overview.
+- Show loading/empty state where relevant.
+
+REQUIREMENTS
+- Do not add Firebase or Bluetooth yet.
+- Make code changes directly in this workspace, do not only print snippets.
+- Keep code small, understandable and easily testable.
+- Explain exact files changed and how I run the app.
+- Run a Gradle debug build if possible; if not, explain what couldn't be tested.
+- Update PROJECT_STATUS.md and stop.
+
+[P2] Navigation and five student screens (Days 4–5)
+-----------------------------------------------------------------
+Extend SmartAttend using the existing Kotlin/Jetpack Compose project.
+
+IMPLEMENT THESE STUDENT SCREENS
+1. Home/Current Class: lecture, room, class time, detection status.
+2. My Attendance: subject-wise attended/total classes, percentages and shortage warning.
+3. History: date, subject, Present/Late/Review/Absent status.
+4. Timetable: today's scheduled lectures and active session indicator.
+5. Profile: student name, roll number, department, batch and future device placeholder.
+
+Add functional navigation, consistent styles, local sample-data repository and helpful empty/error UI. Demo data must be visibly labeled.
+
+Do not add Firebase or BLE. Do not accidentally break the working login screen.
+Run build checks, explain exactly how to tap through every screen, update PROJECT_STATUS.md, stop.
+
+[P3] Firebase readiness and rules planning (Day 6)
+-----------------------------------------------------------------
+Prepare the existing SmartAttend Android app for Firebase integration, but do not invent credentials or assume I have finished Firebase Console setup.
+
+First inspect Gradle files and check whether app/google-services.json exists.
+
+I will manually create the Firebase project, register Android package com.smartattend.app, download google-services.json, enable email/password authentication, and create Firestore.
+
+TASKS
+- Tell me which Firebase Console steps are still missing.
+- Add compatible Firebase Android plugins/dependencies only when configuration is present or when it is safe to do so.
+- Use currently supported Firebase SDK artifacts and the BoM; avoid obsolete KTX artifacts.
+- Prepare a concise data model for users, subjects, enrollments, timetable, sessions, presenceEvents, attendance and auditLogs.
+- Draft deny-by-default security rules: student only own data; no student write to finalized attendance; teacher-only authorized operations; no self-assignment of role.
+- Explain a safe way to manually bootstrap the first teacher account in Firebase Console.
+- Do not put passwords or service-account private keys in source code.
+- Run available build checks, update PROJECT_STATUS.md and stop.
+
+[P4] Firebase student login and profile (Day 7)
+-----------------------------------------------------------------
+Connect SmartAttend to the Firebase project already configured in this workspace.
+
+IMPLEMENT
+- Email/password student authentication with Firebase Authentication.
+- Login/logout and persistent signed-in state.
+- Firestore profile reads tied to Firebase Auth UID.
+- Loading, success, no-profile, and meaningful error states.
+- Students must not read another student's profile or attendance.
+- Keep a clearly separated mock/demo data mode for offline UI work.
+
+SECURITY
+- Do not let users choose their own teacher/admin role.
+- Include/adjust Firestore rules and a clear console deployment checklist.
+- Do not allow student writes to final attendance records.
+- Explain any required manual Firestore test-user and profile setup.
+
+Keep the app building, add appropriate tests if practical, update PROJECT_STATUS.md, and tell me how to verify using two test student accounts. Stop after this milestone.
+
+[P5] Timetable and active class validation (Day 8)
+-----------------------------------------------------------------
+Implement the data and app logic for SmartAttend active class sessions.
+
+Data concepts: student, batch/enrollment, subject, room, timetable, teacher, session start/end, session status.
+
+FEATURES
+- Show today's timetable and the current active class on Home.
+- Check whether signed-in student is enrolled in the active batch/subject.
+- Distinguish No class, Upcoming class, Active eligible class and Active ineligible class.
+- Do not create any attendance record from merely opening the app.
+- Use consistent UTC timestamps for storage and display campus-local times clearly.
+- Validate user/session relationships with appropriate Firestore rules or trusted teacher-controlled records.
+- Provide test sample records with instructions for entering them safely.
+
+Do not implement real BLE scanning. Run tests/build, explain the verification steps and update PROJECT_STATUS.md. Stop.
+
+[P6] Simulated attendance engine (Days 9–10)
+-----------------------------------------------------------------
+Implement a clearly labeled SIMULATION ONLY attendance engine in the existing SmartAttend Android app. I do not own any ESP32 boards yet.
+
+ARCHITECTURE
+- PresenceSource abstraction that emits presence state/events.
+- SimulatedPresenceSource with manual Enter Classroom and Exit Classroom buttons.
+- Keep a future BlePresenceSource placeholder/integration note separate; no fake BLE readings.
+- AttendanceCalculator and a testable clock abstraction.
+
+LOGIC
+1. Require a signed-in student who is enrolled in an active subject/batch/session.
+2. On demo Enter, record event and start accumulating duration.
+3. On demo Exit, close the current interval.
+4. Re-entry continues accumulating time without duplicate counting.
+5. At session end, close any open interval and compute percentage = confirmed minutes / scheduled or configured lecture minutes * 100.
+6. Example policy: >=75% Present, 50% to <75% Review, <50% Absent. Track Late separately using a configurable grace period.
+7. Reject inactive/wrong-batch/duplicate events.
+8. Use a controllable fake clock for fast testing without waiting an hour.
+9. Label ALL simulated records and screens DEMO / NOT VERIFIED BY BLE.
+10. Separate untrusted student-reported presence evidence from teacher-authorized final records.
+
+TESTS
+100%, 75%, 74.9%, 50%, 49.9%, re-entry, repeat enter/exit, late arrival, early exit, wrong enrollment, inactive session, session end with open interval.
+
+Do not claim proxy prevention or secure physical presence. Run real tests/build where possible; update PROJECT_STATUS.md and stop.
+
+[P7] Teacher dashboard (Days 11–12)
+-----------------------------------------------------------------
+Build a basic SmartAttend teacher/admin web dashboard in the existing repository folder teacher-dashboard/ using HTML, CSS, JavaScript and Firebase Web SDK.
+
+REQUIREMENTS
+- Reuse the app's existing Firestore collection names and document structure.
+- Teacher sign-in via Firebase Auth.
+- Responsive clean navy/blue UI.
+- Today's timetable and class sessions.
+- Start/stop a class session where the authenticated account is authorized.
+- Live attendance/demo evidence table.
+- Finalized attendance table with Present/Late/Review/Absent.
+- Teacher correction requires written reason and writes an audit record.
+- CSV export for class attendance.
+
+SECURITY
+- Teacher roles must be assigned outside student self-service.
+- Enforce rights in Firestore rules/trusted backend, not only by hiding buttons.
+- Prevent students from directly setting attendance statuses or teacher permissions.
+- Never embed service-account private keys.
+- Clearly indicate demo/simulated presence.
+
+Scope: one classroom, one teacher, a few demo student accounts. No complex analytics or production deployment.
+
+Tell me exactly how to run the web dashboard locally, finish required Firebase console steps, test teacher vs student permissions, and run/build checks. Update PROJECT_STATUS.md and stop.
+
+[P8] End-to-end demo rehearsal (Day 13)
+-----------------------------------------------------------------
+Audit and test the existing SmartAttend prototype end to end. Do not start redesigning the UI.
+
+DEMO FLOW
+1. Teacher signs in and starts a class.
+2. Eligible student signs in.
+3. Student sees active eligible session.
+4. Student explicitly uses SIMULATED entry and exit.
+5. App computes presence duration and percentage.
+6. Authorized teacher sees evidence and final attendance result.
+7. Teacher makes a justified correction and audit log records the action.
+8. Student sees updated finalized status.
+
+NEGATIVE CASES
+- Wrong-batch student
+- Inactive session
+- Student tries to edit own finalized attendance
+- Student attempts teacher operation
+- Double entry and repeated exit
+- Internet unavailable or Firestore operation fails
+
+For each test report PASS, FAIL or NOT RUN and include evidence (command/result or human manual verification needed). Fix only confirmed bugs. Update PROJECT_STATUS.md and write TEST_REPORT.md. Stop.
+
+[P9] APK, backup, documentation and viva (Day 14)
+-----------------------------------------------------------------
+Prepare this SmartAttend repository for final-year college demonstration.
+
+DELIVERABLES
+1. Verify Gradle assembleDebug, provide precise APK path only if generated.
+2. Write README.md: project purpose, architecture, stack, Windows setup, run steps, how DEMO mode works, Firebase setup, teacher dashboard launch.
+3. Write TEST_REPORT.md with actual results, unrun tests and limitations.
+4. Write DEMO_SCRIPT.md with a 5-minute walkthrough.
+5. Write VIVA_NOTES.md with BLE/RSSI, why 3 ESP32 nodes, Firebase, presence duration, security and limitations.
+6. Include notes on how to add real ESP32 hardware later.
+7. Produce a list of files to back up and any environment-specific files that need reconfiguration.
+8. Update PROJECT_STATUS.md so a new Codex chat can resume.
+
+Do not claim real BLE, GPS accuracy, fraud-proof attendance or full production security. Run checks and list exact success/failure. Stop.
+
+[P10] Fix an error without damaging the app (Whenever something breaks)
+-----------------------------------------------------------------
+You are fixing an error in my existing SmartAttend repository. I am a programming beginner.
+
+ERROR / SYMPTOM:
+[PASTE THE FULL ERROR OR DESCRIBE WHAT HAPPENED]
+
+WHAT I DID BEFORE IT FAILED:
+[EXPLAIN LAST STEP]
+
+TASK
+1. Inspect the related source and build files before changing anything.
+2. Explain the cause simply.
+3. Apply the smallest safe change that addresses the observed error.
+4. Avoid rewriting working screens or architecture.
+5. Run the relevant build/test if available; be honest about what was not run.
+6. Report which files changed and how I can verify the fix.
+7. Update PROJECT_STATUS.md.
+
+Do not add unrelated new features.
+
+[P11] Resume development in a fresh Codex chat (Use if browser/Codex session disappears)
+-----------------------------------------------------------------
+We are resuming SmartAttend after losing prior chat context. Do not assume anything from memory.
+
+PROJECT:
+Android Kotlin/Jetpack Compose, Firebase, a separate teacher dashboard, simulated attendance only for now. No ESP32 boards yet.
+
+FIRST ACTIONS
+1. Read AGENTS.md, PROJECT_STATUS.md, PROJECT_PLAN.md and README.md if available.
+2. Inspect Git status and the relevant current files.
+3. Tell me what already works, which tests were actually run, unresolved errors and the most important next milestone.
+4. Do NOT restart the project, change dependencies without reason, or recreate features already working.
+5. Suggest ONE small next coding task and ask for my approval before editing.
+
+Keep every response beginner-friendly and update PROJECT_STATUS.md after work.
+
+[P12] Later: connect actual ESP32 BLE boards (Only after buying hardware)
+-----------------------------------------------------------------
+SmartAttend already has a tested simulated PresenceSource. Now integrate 3 physical ESP32 BLE beacons without rewriting other attendance logic.
+
+FIRST: inspect existing code, ask for exact ESP32 board model and Android phone version.
+
+THEN IN SMALL STEPS:
+1. Provide compatible Arduino ESP32 BLE beacon code for one node, with unique classroom/node identifiers.
+2. Help me flash and detect one ESP32 via a phone scanner.
+3. Build the Android BLE scanning source with Android-version-appropriate permissions and lifecycle handling.
+4. Show RSSI from one node, then all three.
+5. Add filtering, an initial configurable 2-of-3 consistency/dwell rule, and a signal-loss timeout.
+6. Calibrate inside seats, outside walls, doorway and corridor with multiple phones.
+7. Replace demo PresenceSource only in an explicitly selected real-hardware mode.
+8. Preserve demo mode for troubleshooting, and never label it hardware verified.
+9. Document background scanning restrictions, device variability, spoofing risk and absence of exact indoor location.
+10. Test, record measured results and keep teacher correction path.
+
+Do not claim perfect anti-proxy, exact triangulation or secure presence solely from RSSI. Start with inspecting the current repository and giving me the first physical setup step, not a huge rewrite.
+
