@@ -24,7 +24,7 @@ Open **Schedule**, move between dates, and open a lecture/lab detail. Open **Inb
 
 ## 3:50 — More, device, and settings
 
-Open **More**. Review Profile and seeded correction examples. In **Registered device**, save a label and show `PENDING SERVER VERIFICATION`; never describe it as trusted or verified. In **Settings**, change notification/reminder/theme preferences and show the confirmation required before resetting demo data.
+Open **More**. Review Profile and seeded correction examples. In **Registered device**, save a label and show `PENDING SERVER VERIFICATION`; never describe it as trusted or verified. In **Settings**, change notification/reminder/theme preferences and show the confirmation required before resetting demo data. Open **Privacy & permissions** to show that Bluetooth, location, notifications, and internet access are not declared in this APK. Open **Offline & BLE status** to show cached counts, pending operations, and simulator-only diagnostics.
 
 ## 4:40 — Next milestones
 

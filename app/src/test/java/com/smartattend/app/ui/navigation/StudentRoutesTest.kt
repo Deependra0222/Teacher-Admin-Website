@@ -1,6 +1,7 @@
 package com.smartattend.app.ui.navigation
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNull
 import org.junit.Test
 
@@ -22,5 +23,16 @@ class StudentRoutesTest {
         assertNull(StudentRoutes.noticeId("schedule/demo"))
         assertNull(StudentRoutes.attendanceId("correction/new/"))
         assertNull(StudentRoutes.scheduleId("schedule-detail/%"))
+    }
+
+    @Test
+    fun privacyAndDiagnosticsAreDistinctTopLevelRoutes() {
+        val routes = setOf(
+            StudentRoutes.PRIVACY_PERMISSIONS,
+            StudentRoutes.OFFLINE_DIAGNOSTICS,
+        )
+
+        assertEquals(2, routes.size)
+        assertTrue(routes.all { '/' !in it && it.isNotBlank() })
     }
 }

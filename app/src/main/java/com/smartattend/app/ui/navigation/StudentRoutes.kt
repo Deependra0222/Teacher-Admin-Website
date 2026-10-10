@@ -17,6 +17,8 @@ object StudentRoutes {
     const val SETTINGS = "settings"
     const val PROFILE = "profile"
     const val ABOUT_DEMO = "about-demo"
+    const val PRIVACY_PERMISSIONS = "privacy-permissions"
+    const val OFFLINE_DIAGNOSTICS = "offline-diagnostics"
 
     const val SUBJECT_PATTERN = "subject/{id}"
     const val NOTICE_PATTERN = "notice/{id}"

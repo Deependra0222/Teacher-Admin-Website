@@ -49,6 +49,8 @@ import com.smartattend.app.ui.more.CorrectionFormScreen
 import com.smartattend.app.ui.more.CorrectionListScreen
 import com.smartattend.app.ui.more.DeviceRegistrationScreen
 import com.smartattend.app.ui.more.MoreScreen
+import com.smartattend.app.ui.more.OfflineDiagnosticsScreen
+import com.smartattend.app.ui.more.PrivacyPermissionsScreen
 import com.smartattend.app.ui.more.SettingsScreen
 import com.smartattend.app.ui.navigation.StudentRoutes
 import com.smartattend.app.ui.profile.ProfileScreen
@@ -150,6 +152,8 @@ private fun StudentNavHost(navController: NavHostController, state: SmartAttendU
                 onCorrections = { navController.navigate(StudentRoutes.CORRECTIONS) },
                 onDevice = { navController.navigate(StudentRoutes.DEVICE) },
                 onSettings = { navController.navigate(StudentRoutes.SETTINGS) },
+                onPrivacy = { navController.navigate(StudentRoutes.PRIVACY_PERMISSIONS) },
+                onDiagnostics = { navController.navigate(StudentRoutes.OFFLINE_DIAGNOSTICS) },
                 onAbout = { navController.navigate(StudentRoutes.ABOUT_DEMO) },
             )
         }
@@ -187,6 +191,12 @@ private fun StudentNavHost(navController: NavHostController, state: SmartAttendU
         }
         composable(StudentRoutes.SETTINGS) {
             SettingsScreen(state.settings, state.syncState, state.pendingOperations, navController::popBackStack, viewModel::setNotificationsEnabled, viewModel::setReminderMinutes, viewModel::setTheme, viewModel::resetDemoData)
+        }
+        composable(StudentRoutes.PRIVACY_PERMISSIONS) {
+            PrivacyPermissionsScreen(navController::popBackStack)
+        }
+        composable(StudentRoutes.OFFLINE_DIAGNOSTICS) {
+            OfflineDiagnosticsScreen(state, navController::popBackStack, viewModel::retryOfflineData)
         }
         composable(StudentRoutes.PROFILE) { ProfileScreen(state.student, navController::popBackStack, viewModel::logout) }
         composable(StudentRoutes.ABOUT_DEMO) { AboutDemoScreen(navController::popBackStack) }

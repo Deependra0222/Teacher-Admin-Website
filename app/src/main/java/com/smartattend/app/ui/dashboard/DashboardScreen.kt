@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.BluetoothSearching
+import androidx.compose.material.icons.automirrored.rounded.BluetoothSearching
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.School
@@ -73,7 +73,7 @@ fun DashboardScreen(
             }
         }
         item {
-            StudentSectionCard("Simulated classroom presence", icon = Icons.Rounded.BluetoothSearching) {
+            StudentSectionCard("Simulated classroom presence", icon = Icons.AutoMirrored.Rounded.BluetoothSearching) {
                 Text("SIMULATED — NOT VERIFIED BY BLE", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
                 Text(if (state.insideClassroom) "Demo state: inside classroom" else "Demo state: outside classroom")
                 Text("Confirmed demo time: ${state.confirmedMinutes} min")

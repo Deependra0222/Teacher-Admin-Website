@@ -9,7 +9,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PrivacyTip
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -23,7 +25,16 @@ import com.smartattend.app.ui.components.StudentSectionCard
 import com.smartattend.app.ui.components.SyncPill
 
 @Composable
-fun MoreScreen(state: SmartAttendUiState, onProfile: () -> Unit, onCorrections: () -> Unit, onDevice: () -> Unit, onSettings: () -> Unit, onAbout: () -> Unit) {
+fun MoreScreen(
+    state: SmartAttendUiState,
+    onProfile: () -> Unit,
+    onCorrections: () -> Unit,
+    onDevice: () -> Unit,
+    onSettings: () -> Unit,
+    onPrivacy: () -> Unit,
+    onDiagnostics: () -> Unit,
+    onAbout: () -> Unit,
+) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { ScreenHeader("More", "Profile, requests, device and offline settings") }
         item { DemoDataPill() }
@@ -32,6 +43,8 @@ fun MoreScreen(state: SmartAttendUiState, onProfile: () -> Unit, onCorrections: 
         item { MoreRow("Correction requests", "${state.corrections.size} demo request(s)", Icons.Rounded.EditNote, onCorrections) }
         item { MoreRow("Registered device", state.device?.state?.name?.replace('_', ' ') ?: "Not registered", Icons.Rounded.Devices, onDevice) }
         item { MoreRow("Settings", "Notifications, reminders, theme and reset", Icons.Rounded.Settings, onSettings) }
+        item { MoreRow("Privacy & permissions", "Review local data and Android permission boundaries", Icons.Rounded.PrivacyTip, onPrivacy) }
+        item { MoreRow("Offline & BLE status", "Inspect backend, pending operations and simulated signals", Icons.Rounded.CloudOff, onDiagnostics) }
         item { MoreRow("About demo mode", "What is simulated and what remains pending", Icons.Rounded.Info, onAbout) }
     }
 }

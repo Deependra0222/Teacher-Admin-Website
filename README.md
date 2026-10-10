@@ -15,6 +15,7 @@ This APK uses realistic demo data and a simulated BLE decision engine. It does *
 - Profile, notifications/reminder settings, system/light/dark theme, demo information, logout, and confirmed demo reset.
 - Offline Room data, DataStore preferences, deterministic demo seeding, pending-operation tracking, and backend-ready repositories.
 - Simulated BLE filtering/dwell/hysteresis/loss diagnostics with no Bluetooth permission or scanner.
+- Android launch splash plus dedicated Privacy & Permissions and Offline & BLE Diagnostics screens.
 
 ## Open and run in Android Studio on Windows
 
@@ -23,12 +24,12 @@ This APK uses realistic demo data and a simulated BLE decision engine. It does *
 3. Select the whole project folder: `D:\Smart Attend`.
 4. Wait for Gradle sync and indexing to finish. Do not open only the `app` folder.
 5. If Android Studio asks for a Gradle JDK, open **File > Settings > Build, Execution, Deployment > Build Tools > Gradle** and choose JDK 17. The included path is `D:\Smart Attend\.toolchains\jdk17\jdk-17.0.20.1+1`.
-6. Make sure the Windows `C:` drive has several GB free, then open **Tools > Device Manager** and start an emulator; alternatively connect an authorized Android phone with USB debugging enabled. At final handoff this computer had only about 0.04 GB free on `C:`, which blocks a new emulator boot until space is freed.
+6. Make sure the Windows `C:` drive has several GB free, then open **Tools > Device Manager** and start an emulator; alternatively connect an authorized Android phone with USB debugging enabled. The earlier low-disk blocker was cleared before final verification.
 7. Select the `app` run configuration and your device in the top toolbar.
 8. Press the green **Run** triangle.
 9. On the login screen, keep the prefilled demo values `CS-042` and `demo123`, then tap **Continue in demo mode**.
 
-Use the five bottom tabs and open their cards to review all nested workflows. On Dashboard, **Simulate signals** runs only the in-app decision engine. It is not real BLE evidence.
+Use the five bottom tabs and open their cards to review all nested workflows. Under **More**, review **Privacy & permissions** and **Offline & BLE status**. On Dashboard, **Simulate signals** runs only the in-app decision engine. It is not real BLE evidence.
 
 ## Build from PowerShell
 

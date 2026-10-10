@@ -28,7 +28,7 @@ Status: **Completed and verified on an API 36 emulator.**
 - Preferences DataStore 1.2.1 for installation ID, seed version, notifications, reminder lead time, and theme.
 - Repository interfaces keep a future Firebase adapter separate from screens.
 - Navigation Compose with five primary destinations and all approved nested workflows.
-- Dashboard, subject attendance/detail, filterable history, shortage calculator, calendar/agenda schedule, notices, correction requests, device registration, settings, profile, and demo-boundary screens.
+- Android launch splash plus demo login; dashboard/live simulator; subject attendance/detail; filterable history; shortage calculator; calendar/agenda schedule; notices; correction requests; device registration; settings; profile; privacy/permission disclosure; and offline/BLE diagnostics.
 - Persistent offline mutations and explicit backend-unconfigured/pending states.
 - Platform-independent BLE decision engine using simulated signals, allowlists, median/EMA filtering, dwell, hysteresis, and signal-loss timeout.
 

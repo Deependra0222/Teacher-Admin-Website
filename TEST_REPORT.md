@@ -7,13 +7,13 @@ Date: 2026-10-10 (Asia/Calcutta)
 | Check | Result | Evidence |
 |---|---|---|
 | Focused BLE unit suite after regression fix | PASS | 7 tests; the signal-loss deadline now ignores cached timer-only observations. |
-| Complete JVM suite | PASS | 48 tests across 12 suites; 0 failures, 0 errors. |
+| Complete JVM suite | PASS | 49 tests across 12 suites; 0 failures, 0 errors. |
 | Requested build command | PASS | `gradlew.bat testDebugUnitTest assembleDebug` completed successfully with the project JDK 17 environment. |
 | Android lint | PASS WITH RECOMMENDATIONS | `lintDebug`: 0 errors, 9 dependency/target-version recommendations. |
 | Instrumentation suite | PASS | `connectedDebugAndroidTest`: 2 tests, 0 failures on Pixel 7 API 36. |
 | Debug APK install | PASS | `installDebug` installed the APK on Pixel 7 API 36. |
-| APK output | PASS | `app/build/outputs/apk/debug/app-debug.apk`, 19,202,482 bytes. |
-| APK integrity | RECORDED | SHA-256 `D8BC9F86CD3CC8F552FEDE8610FEABEA61DA11CEB2351591E211E4C28A2BEF57`. |
+| APK output | PASS | `app/build/outputs/apk/debug/app-debug.apk`, 30,375,875 bytes. |
+| APK integrity | RECORDED | SHA-256 `0B95659DC2C1CF7E548FD558949916136AC710FA10517782D05807821EA233DD`. |
 
 The Android project uses Gradle 8.12, Android Gradle Plugin 8.9.1, Kotlin/Compose plugin 2.2.0, Room 2.8.5, DataStore 1.2.1, compile/target SDK 35, minimum SDK 26, and JDK 17.
 
@@ -27,6 +27,7 @@ The Android project uses Gradle 8.12, Android Gradle Plugin 8.9.1, Kotlin/Compos
 - BLE allowlist, distinct-beacon threshold, dwell, median/EMA outlier rejection, hysteresis, staying, signal loss, unknown beacon, wrong session, invalid RSSI, and backward timestamp rejection.
 - Deterministic seed IDs, demo provenance, distinct dates/types, and seeded correction examples.
 - Nested route encoding/decoding and malformed-route rejection.
+- Distinct, valid top-level routes for Privacy & Permissions and Offline & BLE Diagnostics.
 
 ## Instrumentation behavior covered
 
@@ -46,10 +47,11 @@ The `Pixel_7` AVD booted on Android API 36. The APK installed and launched. UI h
 - Attendance, Schedule, Inbox, and More primary destinations.
 - Shortage calculator, subject detail, filtered history, correction form, schedule detail, and notice detail.
 - Profile, correction list, device registration, settings, and About Demo routes.
+- Privacy & Permissions and Offline & BLE Diagnostics routes with the expected absent-permission, backend-unconfigured, and simulated-BLE wording.
 - Device registration action rendered `PENDING SERVER VERIFICATION`.
 - Demo labels and backend-unconfigured state were visible.
 
-The `Medium_Phone_API_36` AVD remained `offline` in ADB; it was abandoned without wiping its data. During a later persistence recapture Windows first reported paging/process-launch errors; a clean emulator invocation then identified the concrete blocker: `C:` had only about 0.04 GB free, so the AVD refused to start. That specific post-restart UI recapture is not claimed. Repository persistence behavior remains covered by implementation and instrumentation tests, while physical process-death/OEM behavior remains for device testing.
+The `Medium_Phone_API_36` AVD remained `offline` in ADB and was not used. An earlier Pixel 7 restart failed while `C:` had about 0.04 GB free; that condition was later resolved. With about 27.56 GB free, Pixel 7 API 36 booted again, the final APK installed, both instrumentation tests passed, and the new routes passed a UI-hierarchy smoke check. Physical process-death/OEM behavior remains for phone testing.
 
 ## Not run / not verified
 
