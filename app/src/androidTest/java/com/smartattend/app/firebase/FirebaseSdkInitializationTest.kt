@@ -18,10 +18,15 @@ class FirebaseSdkInitializationTest {
     fun packagedConfigurationInitializesDefaultAppAndRequestedSdks() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val app = FirebaseApp.getInstance()
+        val auth = FirebaseAuth.getInstance(app)
+        val firestore = FirebaseFirestore.getInstance(app)
 
         assertFalse(app.options.applicationId.isBlank())
-        assertNotNull(FirebaseAuth.getInstance(app))
-        assertNotNull(FirebaseFirestore.getInstance(app))
+        assertFalse(app.options.projectId.orEmpty().isBlank())
+        assertNotNull(auth)
+        assertNotNull(firestore)
+        assertEquals(app.name, auth.app.name)
+        assertEquals(app.name, firestore.app.name)
         assertEquals("com.smartattend.app", context.packageName)
     }
 }
