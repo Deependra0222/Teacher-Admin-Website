@@ -1,6 +1,7 @@
 package com.smartattend.app.data.firebase
 
 import com.smartattend.app.domain.auth.AuthError
+import com.smartattend.app.domain.auth.PasswordResetResult
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -66,6 +67,34 @@ class FirebaseErrorMapperTest {
         assertEquals(
             AuthError.UNKNOWN,
             FirebaseErrorMapper.mapFirestoreCode("INTERNAL"),
+        )
+    }
+
+    @Test
+    fun passwordResetDoesNotRevealWhetherAccountExists() {
+        assertEquals(
+            PasswordResetResult.Sent,
+            FirebaseErrorMapper.mapPasswordResetAuthCode("ERROR_USER_NOT_FOUND"),
+        )
+        assertEquals(
+            PasswordResetResult.Sent,
+            FirebaseErrorMapper.mapPasswordResetAuthCode("ERROR_INVALID_CREDENTIAL"),
+        )
+        assertEquals(
+            PasswordResetResult.Sent,
+            FirebaseErrorMapper.mapPasswordResetAuthCode("ERROR_USER_DISABLED"),
+        )
+    }
+
+    @Test
+    fun passwordResetStillReportsActionableFailures() {
+        assertEquals(
+            PasswordResetResult.Failure(AuthError.TOO_MANY_REQUESTS),
+            FirebaseErrorMapper.mapPasswordResetAuthCode("ERROR_TOO_MANY_REQUESTS"),
+        )
+        assertEquals(
+            PasswordResetResult.Failure(AuthError.NETWORK),
+            FirebaseErrorMapper.mapPasswordResetAuthCode("ERROR_NETWORK_REQUEST_FAILED"),
         )
     }
 }

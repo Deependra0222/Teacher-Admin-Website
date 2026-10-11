@@ -4,6 +4,7 @@ import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.smartattend.app.domain.auth.AuthError
+import com.smartattend.app.domain.auth.PasswordResetResult
 
 object FirebaseErrorMapper {
     fun mapAuthCode(code: String?): AuthError = when (code) {
@@ -29,8 +30,26 @@ object FirebaseErrorMapper {
         else -> AuthError.UNKNOWN
     }
 
+    fun mapPasswordResetAuthCode(code: String?): PasswordResetResult {
+        val error = mapAuthCode(code)
+        return if (error == AuthError.INVALID_CREDENTIALS || error == AuthError.ACCOUNT_DISABLED) {
+            PasswordResetResult.Sent
+        } else {
+            PasswordResetResult.Failure(error)
+        }
+    }
+
+    fun mapPasswordResetThrowable(throwable: Throwable): PasswordResetResult {
+        val authError = throwable.causes().filterIsInstance<FirebaseAuthException>().firstOrNull()
+        return if (authError != null) {
+            mapPasswordResetAuthCode(authError.errorCode)
+        } else {
+            PasswordResetResult.Failure(mapThrowable(throwable))
+        }
+    }
+
     fun mapThrowable(throwable: Throwable): AuthError {
-        val causes = generateSequence(throwable as Throwable?) { it.cause }
+        val causes = throwable.causes()
         causes.filterIsInstance<FirebaseNetworkException>().firstOrNull()?.let {
             return AuthError.NETWORK
         }
@@ -42,4 +61,7 @@ object FirebaseErrorMapper {
         }
         return AuthError.UNKNOWN
     }
+
+    private fun Throwable.causes(): Sequence<Throwable> =
+        generateSequence(this as Throwable?) { it.cause }.filterNotNull()
 }

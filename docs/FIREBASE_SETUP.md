@@ -11,8 +11,9 @@ The offline Demo Mode still works without signing in or reaching Firestore. The 
 5. Firebase BoM `34.19.0` manages the non-KTX `firebase-auth` and `firebase-firestore` main modules.
 6. Gradle resource processing, debug compilation, and an API 36 instrumentation initialization test pass.
 7. Real login calls `FirebaseAuth.signInWithEmailAndPassword`; password reset calls `sendPasswordResetEmail`; Firebase session restoration waits for the first Auth state callback.
-8. Successful Auth is permitted into the student app only after the matching Firestore profile is read and validated. Missing, incomplete, unreadable, or non-student profiles are signed out.
-9. Demo Mode is a separate explicit action backed by a DataStore marker. A failed Firebase request never falls back to demo.
+8. Successful Auth is permitted into the student app only after the matching Firestore profile is read from the server and validated. Cached profiles cannot authorize offline; missing, incomplete, unreadable, or non-student profiles are signed out.
+9. Password-reset completion remains neutral for nonexistent or disabled accounts so the UI does not reveal whether an email is registered.
+10. Demo Mode is a separate explicit action backed by a DataStore marker. A failed Firebase request never falls back to demo.
 
 Firebase BoM `35.0.0` was evaluated first but selected Firebase Authentication `25.0.0`, whose Kotlin metadata `2.4.0` is newer than this project's Kotlin compiler `2.2.0`. BoM `34.19.0` is the newest version verified here that compiles with the current project toolchain; it resolves Authentication `24.2.0` and Firestore `26.6.0`. Upgrade the project Kotlin toolchain and re-run all checks before moving to a newer BoM.
 

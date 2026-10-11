@@ -20,7 +20,7 @@ All sample attendance, device, correction, notice, timetable, and BLE content re
 - Confirmed `processDebugGoogleServices` succeeds and the merged APK manifest contains Firebase component registrars and `FirebaseInitProvider`.
 - On the Pixel 7 API 36 emulator, the default Firebase app, Auth client, and Firestore client initialized; a cold app launch logged `FirebaseApp initialization successful`.
 - Implemented `FirebaseAuth.signInWithEmailAndPassword`, `sendPasswordResetEmail`, Auth-state restoration, Firebase logout, and stable error mapping behind `AuthenticationRepository`.
-- Implemented one read-only Firestore lookup at `users/{authenticatedUid}`. Authorization requires exact `role: "student"` plus nonblank `name`, `email`, `rollNumber`, `department`, and `batch`; `Student.id` always comes from the Auth UID.
+- Implemented one server-only, read-only Firestore lookup at `users/{authenticatedUid}` so stale cached roles cannot authorize offline. Authorization requires exact `role: "student"` plus nonblank `name`, `email`, `rollNumber`, `department`, and `batch`; `Student.id` always comes from the Auth UID.
 - Missing, incomplete, wrong-role, denied, or failed profile reads sign the Firebase user out and never enter student navigation.
 - Added an explicit DataStore Demo Mode marker. Firebase restoration wins over stale demo state; Firebase login clears demo first; Firebase failure never opens Demo Mode.
 - The Room/DataStore offline experience remains active. A Firebase identity changes only the displayed authorized student profile; attendance and all other records remain demo/not synchronized.
@@ -84,11 +84,11 @@ The interrupted focused test expected `SIGNAL_LOST` at the configured timeout bu
 Fresh verification on 2026-10-11 covered the authentication implementation, full regression suite, APK, and safe emulator behavior.
 
 - `build-smartattend.bat testDebugUnitTest assembleDebug lintDebug --no-daemon`: **PASS**.
-- JVM tests: **76 tests, 16 suites, 0 failures**.
+- JVM tests: **79 tests, 17 suites, 0 failures**.
 - Pixel 7 Android API 36 instrumentation: **9 tests, 0 failures** (Room/repository, Firebase SDK initialization, and 6 Compose login-action tests).
 - Android lint: **PASS, 0 errors, 9 target/dependency version recommendations**.
 - Debug APK: **26,930,890 bytes**.
-- APK SHA-256: `5870A35AF2FA8D45C828F50CAAFBA30512C40C4715C8C5749EBE4EE11701BFB9`.
+- APK SHA-256: `61BB09E4CA5F97BEE77C3CBCA310897F3779F5E982C121AF519E91F10412337C`.
 - Emulator install and cold launch: **PASS** on `Pixel_7` API 36.
 - Fresh-data launch showed empty email/password fields plus separate **Sign in with Firebase** and **Continue in Demo Mode** actions.
 - Explicit Demo Mode entry: **PASS**; Dashboard showed `DEMO - NOT VERIFIED BY BLE`.

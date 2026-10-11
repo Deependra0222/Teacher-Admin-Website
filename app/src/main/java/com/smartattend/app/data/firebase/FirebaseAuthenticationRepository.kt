@@ -3,6 +3,7 @@ package com.smartattend.app.data.firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.smartattend.app.domain.auth.AuthError
 import com.smartattend.app.domain.auth.AuthenticationRepository
 import com.smartattend.app.domain.auth.AuthenticationResult
@@ -43,11 +44,14 @@ class FirebaseAuthenticationRepository(
     } catch (error: CancellationException) {
         throw error
     } catch (error: Exception) {
-        PasswordResetResult.Failure(FirebaseErrorMapper.mapThrowable(error))
+        FirebaseErrorMapper.mapPasswordResetThrowable(error)
     }
 
     private suspend fun authorize(user: FirebaseUser): AuthenticationResult = try {
-        val snapshot = firestore.collection(USERS_COLLECTION).document(user.uid).get().await()
+        val snapshot = firestore.collection(USERS_COLLECTION)
+            .document(user.uid)
+            .get(AUTHORIZED_PROFILE_SOURCE)
+            .await()
         val result = StudentProfileMapper.map(
             uid = user.uid,
             data = snapshot.takeIf { it.exists() }?.data,
@@ -71,7 +75,9 @@ class FirebaseAuthenticationRepository(
         auth.addAuthStateListener(listener)
     }
 
-    private companion object {
-        const val USERS_COLLECTION = "users"
+    companion object {
+        internal val AUTHORIZED_PROFILE_SOURCE = Source.SERVER
+
+        private const val USERS_COLLECTION = "users"
     }
 }

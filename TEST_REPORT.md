@@ -7,7 +7,7 @@ Date: 2026-10-11 (Asia/Calcutta)
 | Check | Result | Evidence |
 |---|---|---|
 | Focused BLE unit suite after regression fix | PASS | 7 tests; the signal-loss deadline now ignores cached timer-only observations. |
-| Complete JVM suite | PASS | 76 tests across 16 suites; 0 failures. |
+| Complete JVM suite | PASS | 79 tests across 17 suites; 0 failures. |
 | Requested build/lint command | PASS | `build-smartattend.bat testDebugUnitTest assembleDebug lintDebug --no-daemon` invoked `gradlew.bat` with project JDK 17 and completed successfully. |
 | Google Services resource processing | PASS | `processDebugGoogleServices` completed during the build for package `com.smartattend.app`. |
 | Android lint | PASS WITH RECOMMENDATIONS | `lintDebug`: 0 errors, 9 dependency/target-version recommendations. |
@@ -16,7 +16,7 @@ Date: 2026-10-11 (Asia/Calcutta)
 | Cold app launch | PASS | `com.smartattend.app/.MainActivity` launched into the separate Firebase/Demo choice screen. |
 | Controlled Firebase Auth failure | PASS | A deliberately nonexistent non-secret account produced `Incorrect email or password.` and did not enter Demo Mode. |
 | APK output | PASS | `app/build/outputs/apk/debug/app-debug.apk`, 26,930,890 bytes. |
-| APK integrity | RECORDED | SHA-256 `5870A35AF2FA8D45C828F50CAAFBA30512C40C4715C8C5749EBE4EE11701BFB9`. |
+| APK integrity | RECORDED | SHA-256 `61BB09E4CA5F97BEE77C3CBCA310897F3779F5E982C121AF519E91F10412337C`. |
 
 The Android project uses Gradle 8.12, Android Gradle Plugin 8.9.1, Kotlin/Compose plugin 2.2.0, Room 2.8.5, DataStore 1.2.1, Google Services plugin 4.5.0, Firebase BoM 34.19.0, Authentication 24.2.0, Firestore 26.6.0, compile/target SDK 35, minimum SDK 26, and JDK 17.
 
@@ -34,6 +34,7 @@ The Android project uses Gradle 8.12, Android Gradle Plugin 8.9.1, Kotlin/Compos
 - Firebase credential validation and stable user-facing Auth/Firestore error categories.
 - UID-bound profile mapping, required fields, exact student role, missing/incomplete profiles, and rejection of client-controlled document IDs.
 - Firebase-versus-demo session precedence, explicit demo entry, no failure fallback, logout, reset validation, and profile removal after logout.
+- Server-only profile authorization policy plus password-reset responses that do not reveal whether an account exists.
 
 ## Instrumentation behavior covered
 
