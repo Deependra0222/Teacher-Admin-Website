@@ -22,10 +22,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun DemoBanner(modifier: Modifier = Modifier, applyStatusInset: Boolean = true) {
+fun DemoBanner(
+    modifier: Modifier = Modifier,
+    applyStatusInset: Boolean = true,
+    text: String = "DEMO - NOT VERIFIED BY BLE",
+) {
     val insetModifier = if (applyStatusInset) modifier.statusBarsPadding() else modifier
     Text(
-        text = "DEMO - NOT VERIFIED BY BLE",
+        text = text,
         modifier = insetModifier.fillMaxWidth().background(Color(0xFFFFE9B6)).padding(horizontal = 16.dp, vertical = 9.dp),
         color = Color(0xFF6B4700),
         fontWeight = FontWeight.Bold,

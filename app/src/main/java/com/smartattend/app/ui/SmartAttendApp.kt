@@ -56,6 +56,7 @@ import com.smartattend.app.ui.navigation.StudentRoutes
 import com.smartattend.app.ui.profile.ProfileScreen
 import com.smartattend.app.ui.schedule.ScheduleDetailScreen
 import com.smartattend.app.ui.schedule.ScheduleScreen
+import com.smartattend.app.domain.auth.AuthSessionMode
 
 private data class PrimaryDestination(val route: String, val label: String, val icon: ImageVector)
 
@@ -70,9 +71,30 @@ private val primaryDestinations = listOf(
 @Composable
 fun SmartAttendApp(viewModel: SmartAttendViewModel) {
     val state = viewModel.uiState
-    if (!state.isLoggedIn) {
-        LoginScreen(error = state.loginError, onLogin = viewModel::login)
-        return
+    when (state.authMode) {
+        AuthSessionMode.RESTORING -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    CircularProgressIndicator()
+                    Text("Restoring your session…")
+                }
+            }
+            return
+        }
+        AuthSessionMode.SIGNED_OUT -> {
+            LoginScreen(
+                error = state.loginError,
+                message = state.message,
+                isBusy = state.isAuthenticating,
+                onFirebaseLogin = viewModel::firebaseLogin,
+                onDemoMode = viewModel::enterDemoMode,
+                onPasswordReset = viewModel::sendPasswordReset,
+            )
+            return
+        }
+        AuthSessionMode.DEMO,
+        AuthSessionMode.FIREBASE,
+        -> Unit
     }
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
@@ -100,7 +122,14 @@ fun SmartAttendApp(viewModel: SmartAttendViewModel) {
         },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            DemoBanner(applyStatusInset = false)
+            DemoBanner(
+                applyStatusInset = false,
+                text = if (state.authMode == AuthSessionMode.FIREBASE) {
+                    "FIREBASE PROFILE • DEMO ATTENDANCE • NOT VERIFIED BY BLE"
+                } else {
+                    "DEMO - NOT VERIFIED BY BLE"
+                },
+            )
             when {
                 state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 state.fatalError != null -> Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
@@ -198,7 +227,9 @@ private fun StudentNavHost(navController: NavHostController, state: SmartAttendU
         composable(StudentRoutes.OFFLINE_DIAGNOSTICS) {
             OfflineDiagnosticsScreen(state, navController::popBackStack, viewModel::retryOfflineData)
         }
-        composable(StudentRoutes.PROFILE) { ProfileScreen(state.student, navController::popBackStack, viewModel::logout) }
+        composable(StudentRoutes.PROFILE) {
+            ProfileScreen(state.student, state.authMode, navController::popBackStack, viewModel::logout)
+        }
         composable(StudentRoutes.ABOUT_DEMO) { AboutDemoScreen(navController::popBackStack) }
     }
 }

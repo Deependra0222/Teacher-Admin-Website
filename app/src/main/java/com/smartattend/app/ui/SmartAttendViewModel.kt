@@ -22,12 +22,18 @@ import com.smartattend.app.core.model.TimetableItem
 import com.smartattend.app.data.RepositoryResult
 import com.smartattend.app.data.StudentRepository
 import com.smartattend.app.data.demo.DemoDataRepository
+import com.smartattend.app.data.firebase.FirebaseAuthenticationRepository
 import com.smartattend.app.data.local.AppPreferencesRepository
 import com.smartattend.app.data.local.DemoPreferences
 import com.smartattend.app.data.local.OfflineStudentRepository
 import com.smartattend.app.data.local.SmartAttendDatabase
 import com.smartattend.app.domain.attendance.AttendanceTracker
-import com.smartattend.app.domain.auth.LoginValidator
+import com.smartattend.app.domain.auth.AuthError
+import com.smartattend.app.domain.auth.AuthSessionMode
+import com.smartattend.app.domain.auth.AuthenticationCoordinator
+import com.smartattend.app.domain.auth.AuthenticationState
+import com.smartattend.app.domain.auth.PasswordResetResult
+import com.smartattend.app.domain.auth.userMessage
 import com.smartattend.app.domain.presence.BleDecision
 import com.smartattend.app.domain.presence.BleDecisionConfig
 import com.smartattend.app.domain.presence.BleDecisionKind
@@ -49,7 +55,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 data class SmartAttendUiState(
-    val isLoggedIn: Boolean,
+    val authMode: AuthSessionMode = AuthSessionMode.RESTORING,
+    val isAuthenticating: Boolean = false,
     val isLoading: Boolean = true,
     val fatalError: String? = null,
     val loginError: String? = null,
@@ -79,14 +86,23 @@ data class SmartAttendUiState(
     val calculatorTarget: String = "75",
     val calculatorResult: ShortageProjection? = null,
     val calculatorError: String? = null,
-)
+) {
+    val isLoggedIn: Boolean
+        get() = authMode == AuthSessionMode.DEMO || authMode == AuthSessionMode.FIREBASE
+}
 
 class SmartAttendViewModel(application: Application) : AndroidViewModel(application) {
     private val legacyRepository = DemoDataRepository()
     private val preferences = DemoPreferences(application)
+    private val appPreferences = AppPreferencesRepository(application)
+    private val authentication = AuthenticationCoordinator(
+        repository = FirebaseAuthenticationRepository(),
+        sessionStore = appPreferences,
+        demoStudent = legacyRepository.student,
+    )
     private val repository: StudentRepository = OfflineStudentRepository(
         SmartAttendDatabase.getInstance(application),
-        AppPreferencesRepository(application),
+        appPreferences,
     )
     private val clock = SystemAppClock
     private val source = SimulatedPresenceSource(clock)
@@ -120,27 +136,67 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
     private var bleCursor: Instant = startupNow
     private var repositoryObservationJob: Job? = null
 
-    var uiState by mutableStateOf(baseState(preferences.isLoggedIn).copy(finalResult = restoredResult))
+    var uiState by mutableStateOf(baseState().copy(finalResult = restoredResult))
         private set
 
     init {
         initializeRepository()
         observeRepository()
+        restoreAuthentication()
     }
 
-    fun login(identifier: String, password: String) {
-        val error = LoginValidator.validate(identifier, password)
-        if (error != null) {
-            uiState = uiState.copy(loginError = error)
-            return
+    fun firebaseLogin(email: String, password: String) {
+        if (uiState.isAuthenticating) return
+        uiState = uiState.copy(isAuthenticating = true, loginError = null, message = null)
+        viewModelScope.launch {
+            applyAuthenticationState(
+                runCatching { authentication.signIn(email, password) }
+                    .getOrElse { AuthenticationState(AuthSessionMode.SIGNED_OUT, error = AuthError.UNKNOWN) },
+                successMessage = "Firebase account authenticated. Attendance data is still DEMO and not synchronized.",
+            )
         }
-        preferences.setLoggedIn(true)
-        uiState = uiState.copy(isLoggedIn = true, loginError = null, message = "Signed in to DEMO mode with offline data")
+    }
+
+    fun enterDemoMode() {
+        if (uiState.isAuthenticating) return
+        uiState = uiState.copy(isAuthenticating = true, loginError = null, message = null)
+        viewModelScope.launch {
+            applyAuthenticationState(
+                runCatching { authentication.enterDemoMode() }
+                    .getOrElse { AuthenticationState(AuthSessionMode.SIGNED_OUT, error = AuthError.UNKNOWN) },
+                successMessage = "Entered DEMO mode with offline sample data",
+            )
+        }
+    }
+
+    fun sendPasswordReset(email: String) {
+        if (uiState.isAuthenticating) return
+        uiState = uiState.copy(isAuthenticating = true, loginError = null, message = null)
+        viewModelScope.launch {
+            uiState = when (val result = runCatching { authentication.sendPasswordReset(email) }
+                .getOrElse { PasswordResetResult.Failure(AuthError.UNKNOWN) }) {
+                PasswordResetResult.Sent -> uiState.copy(
+                    isAuthenticating = false,
+                    loginError = null,
+                    message = "Password reset email requested. Check your inbox if the address is registered.",
+                )
+                is PasswordResetResult.Failure -> uiState.copy(
+                    isAuthenticating = false,
+                    loginError = result.error.userMessage(),
+                )
+            }
+        }
     }
 
     fun logout() {
-        preferences.setLoggedIn(false)
-        uiState = uiState.copy(isLoggedIn = false, message = null)
+        if (uiState.isAuthenticating) return
+        uiState = uiState.copy(isAuthenticating = true, message = null)
+        viewModelScope.launch {
+            applyAuthenticationState(
+                runCatching { authentication.logout() }
+                    .getOrElse { AuthenticationState(AuthSessionMode.SIGNED_OUT, error = AuthError.UNKNOWN) },
+            )
+        }
     }
 
     fun enterClassroom() = record(PresenceSignalType.ENTER)
@@ -238,7 +294,15 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
     private fun observeRepository() {
         repositoryObservationJob?.cancel()
         repositoryObservationJob = viewModelScope.launch {
-            launch { repository.student.catch { repositoryFailure(it) }.collect { value -> if (value != null) uiState = uiState.copy(student = value, isLoading = false, fatalError = null) } }
+            launch {
+                repository.student.catch { repositoryFailure(it) }.collect { value ->
+                    if (value != null && uiState.authMode != AuthSessionMode.FIREBASE) {
+                        uiState = uiState.copy(student = value, isLoading = false, fatalError = null)
+                    } else if (value != null) {
+                        uiState = uiState.copy(isLoading = false, fatalError = null)
+                    }
+                }
+            }
             launch { repository.subjects.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(subjects = it) } }
             launch { repository.history.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(history = it) } }
             launch { repository.schedule.catch { repositoryFailure(it) }.collect { uiState = uiState.copy(timetable = it) } }
@@ -293,10 +357,37 @@ class SmartAttendViewModel(application: Application) : AndroidViewModel(applicat
 
     private fun sample(beacon: String, rssi: Int, at: Instant) = BleSample(session.id, beacon, rssi, at, simulated = true)
 
-    private fun baseState(isLoggedIn: Boolean): SmartAttendUiState {
+    private fun restoreAuthentication() {
+        viewModelScope.launch {
+            applyAuthenticationState(
+                runCatching { authentication.restore() }
+                    .getOrElse { AuthenticationState(AuthSessionMode.SIGNED_OUT, error = AuthError.UNKNOWN) },
+            )
+        }
+    }
+
+    private fun applyAuthenticationState(state: AuthenticationState, successMessage: String? = null) {
+        val student = when (state.mode) {
+            AuthSessionMode.FIREBASE,
+            AuthSessionMode.DEMO,
+            -> state.student ?: legacyRepository.student
+            AuthSessionMode.RESTORING,
+            AuthSessionMode.SIGNED_OUT,
+            -> legacyRepository.student
+        }
+        uiState = uiState.copy(
+            authMode = state.mode,
+            isAuthenticating = false,
+            loginError = state.error?.userMessage(),
+            message = if (state.error == null) successMessage else null,
+            student = student,
+        )
+    }
+
+    private fun baseState(): SmartAttendUiState {
         val snapshot = tracker.snapshot()
         return SmartAttendUiState(
-            isLoggedIn = isLoggedIn,
+            authMode = AuthSessionMode.RESTORING,
             student = legacyRepository.student,
             session = session,
             sessionState = SessionAvailability.determine(legacyRepository.student, session, clock.now()),
