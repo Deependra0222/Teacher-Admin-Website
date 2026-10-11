@@ -28,9 +28,22 @@ Status: **Completed and verified on an API 36 emulator.**
 - Preferences DataStore 1.2.1 for installation ID, seed version, notifications, reminder lead time, and theme.
 - Repository interfaces keep a future Firebase adapter separate from screens.
 - Navigation Compose with five primary destinations and all approved nested workflows.
-- Android launch splash plus demo login; dashboard/live simulator; subject attendance/detail; filterable history; shortage calculator; calendar/agenda schedule; notices; correction requests; device registration; settings; profile; privacy/permission disclosure; and offline/BLE diagnostics.
+- Android launch splash plus the original offline demo entry; dashboard/live simulator; subject attendance/detail; filterable history; shortage calculator; calendar/agenda schedule; notices; correction requests; device registration; settings; profile; privacy/permission disclosure; and offline/BLE diagnostics.
 - Persistent offline mutations and explicit backend-unconfigured/pending states.
 - Platform-independent BLE decision engine using simulated signals, allowlists, median/EMA filtering, dwell, hysteresis, and signal-loss timeout.
+
+## Milestone 2A — Firebase student authentication
+
+Status: **Implemented and automated/emulator failure-path verified; real owner account success pending owner-entered credentials/profile.**
+
+- Separate real Firebase and explicit local Demo Mode entry points; no automatic demo fallback.
+- Firebase Email/Password sign-in and password reset behind an authentication repository.
+- UID-bound, read-only `users/{uid}` authorization requiring `role == "student"` and a complete student profile.
+- Auth-state restoration with Firebase precedence over stale demo state.
+- DataStore persists only the explicit Demo Mode marker; passwords, roles, tokens, and Firebase profiles are never stored there.
+- Missing/incomplete/wrong-role/unreadable profiles remain outside navigation and sign out locally.
+- Firebase identities are displayed separately while every unsynchronized attendance record remains visibly DEMO / NOT VERIFIED BY BLE.
+- Firestore rules are unchanged and the Android authentication adapter performs no Firestore write.
 
 ## Milestone 3 — Teacher Admin Website
 
@@ -45,13 +58,14 @@ Status: **Next, pending user review of the Student Android App.**
 - Google Services Gradle plugin `4.5.0` processes the local, Git-ignored `app/google-services.json` for `com.smartattend.app`.
 - Firebase BoM `34.19.0` supplies the non-KTX Authentication and Cloud Firestore main modules.
 - The default Firebase app plus Auth and Firestore client objects initialize on an API 36 emulator.
-- No real sign-in, Firestore read/write, repository synchronization, Security Rules change, Cloud Function, user, or application data was added in this foundation milestone.
+- The later authentication milestone now uses Auth and a single read-only `users/{uid}` lookup. No synchronized app-data write, Security Rules change, Cloud Function, user creation, or application data was added.
 
 ## Milestone 4 — Shared Firebase backend
 
-Status: **Client SDK foundation completed; real accounts, data access, synchronization, rules verification, and server logic not started.**
+Status: **Authentication/profile authorization client implemented; real-account success verification, synchronized app data, rules-emulator verification, and server logic remain pending.**
 
-- Configure Firebase Authentication and student/teacher authorization.
+- Verify the existing student account with owner-entered credentials and an administrator-created `users/{uid}` profile.
+- Extend student/teacher authorization only through trusted backend/admin workflows.
 - Implement secured Firestore collections and verified Security Rules.
 - Implement Cloud Functions for idempotent evidence processing, teacher actions, device registration, and final attendance.
 - Add offline synchronization adapters behind existing repositories.

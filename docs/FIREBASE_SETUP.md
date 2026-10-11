@@ -1,6 +1,6 @@
-# Firebase Android SDK Setup (Connected; Service Operations Pending)
+# Firebase Student Authentication Setup (Implemented; Real Account Verification Pending)
 
-The offline Android build still works without signing in or reaching Firestore. The Firebase Android client SDK is now packaged, but no production account or database workflow is connected to the student repositories.
+The offline Demo Mode still works without signing in or reaching Firestore. The Android app now performs Firebase Email/Password sign-in and a read-only authorization lookup at `users/{authenticatedUid}`. Attendance, timetable, notices, corrections, device registration, and BLE evidence are still local demo data and are not synchronized.
 
 ## Completed foundation
 
@@ -10,25 +10,54 @@ The offline Android build still works without signing in or reaching Firestore. 
 4. Google Services Gradle plugin `4.5.0` is applied using Kotlin DSL.
 5. Firebase BoM `34.19.0` manages the non-KTX `firebase-auth` and `firebase-firestore` main modules.
 6. Gradle resource processing, debug compilation, and an API 36 instrumentation initialization test pass.
+7. Real login calls `FirebaseAuth.signInWithEmailAndPassword`; password reset calls `sendPasswordResetEmail`; Firebase session restoration waits for the first Auth state callback.
+8. Successful Auth is permitted into the student app only after the matching Firestore profile is read and validated. Missing, incomplete, unreadable, or non-student profiles are signed out.
+9. Demo Mode is a separate explicit action backed by a DataStore marker. A failed Firebase request never falls back to demo.
 
 Firebase BoM `35.0.0` was evaluated first but selected Firebase Authentication `25.0.0`, whose Kotlin metadata `2.4.0` is newer than this project's Kotlin compiler `2.2.0`. BoM `34.19.0` is the newest version verified here that compiles with the current project toolchain; it resolves Authentication `24.2.0` and Firestore `26.6.0`. Upgrade the project Kotlin toolchain and re-run all checks before moving to a newer BoM.
 
+## Required student profile
+
+For an Authentication user with UID `<uid>`, a trusted administrator must create `users/<uid>` with these nonblank string fields:
+
+```text
+role: "student"
+name: "Student Name"
+email: "student@example.edu"
+rollNumber: "CS-042"
+department: "Computer Science"
+batch: "CSE-2026-A"
+```
+
+The document ID must be the Firebase Authentication UID. The app ignores any `id` field inside the document and uses the authenticated UID. The role check is case-sensitive. Do not let a student client create or modify this profile.
+
+## How to test the account
+
+1. In Firebase Console, confirm Email/Password sign-in remains enabled.
+2. Copy the test user's UID from Authentication.
+3. In Firestore, create `users/{uid}` with the exact required fields above. Keep the existing restrictive rules.
+4. Run the Android app, enter the account email/password directly in the app, and tap **Sign in with Firebase**.
+5. A configured student sees their real profile plus a banner stating that attendance data is still demo/not synchronized. A missing profile shows **Account Not Configured**. A teacher/admin/wrong role is rejected.
+6. Use **Profile > Sign out** to end the Firebase session. Use **Continue in Demo Mode** only when intentionally reviewing sample data.
+
+Never put the password in source files, terminal commands, documentation, screenshots, or chat messages.
+
 ## Intentionally not performed
 
-- No Authentication user was created and no sign-in was attempted.
-- No Firestore document was read, created, updated, or deleted.
+- No real account credential was supplied to this development session, so a successful registered-user login and authorized production profile read were not claimed.
+- A controlled sign-in attempt for an intentionally nonexistent address verified the real Auth failure path and returned the non-enumerating `Incorrect email or password` UI without entering Demo Mode.
+- No Firestore document was created, updated, or deleted by the app or this milestone.
 - `firestore.rules` was not deployed or changed.
-- No repository adapter, background synchronization, Cloud Function, or server-side attendance finalization was enabled.
-- The existing demo login, Room database, DataStore preferences, and simulated BLE flow remain the active app behavior.
+- No background synchronization, Cloud Function, or server-side attendance finalization was enabled.
+- Room, DataStore preferences, explicit Demo Mode, and simulated BLE remain available.
 
-## Next implementation milestone
+## Next backend implementation milestone
 
-1. Define the authenticated student session state and map Firebase UIDs to trusted `users/{uid}` profiles.
-2. Create test student accounts through a controlled admin workflow; never add credentials to source control.
-3. Implement Firebase repository adapters behind the existing repository interfaces while keeping Room as the offline source of truth.
-4. Define conflict, retry, pending-operation, and sign-out behavior before enabling writes.
-5. Verify authorization with the Firebase Emulator Suite and separate student evidence from teacher-authorized attendance.
-6. Only after emulator verification, review and deploy production Security Rules and then test read-only and write flows with dedicated non-production accounts.
+1. Have the project owner enter the existing test account directly in the emulator and confirm the UID-bound profile loads; do not record its password.
+2. Build/review the Teacher Admin Website as the next product milestone.
+3. Define conflict, retry, and pending-operation behavior before enabling synchronized reads or writes.
+4. Verify authorization with the Firebase Emulator Suite and separate student evidence from teacher-authorized attendance.
+5. Only after emulator verification, review and deploy production Security Rules and then test narrowly scoped flows with dedicated non-production accounts.
 
 ## Shared collection contract
 
