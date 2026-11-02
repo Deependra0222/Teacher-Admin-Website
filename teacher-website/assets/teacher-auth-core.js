@@ -149,7 +149,7 @@ export function createTeacherSessionController({
       if (firebaseGateway === undefined) {
         throw new PortalAuthError(
           "FIREBASE_NOT_CONFIGURED",
-          "Firebase Web sign-in is not configured on this local server.",
+          "Teacher sign-in is not enabled on this site yet.",
         );
       }
 
@@ -186,7 +186,7 @@ export function createTeacherSessionController({
       if (firebaseGateway === undefined) {
         throw new PortalAuthError(
           "FIREBASE_NOT_CONFIGURED",
-          "Firebase Web sign-in is not configured on this local server.",
+          "Teacher sign-in is not enabled on this site yet.",
         );
       }
       try {

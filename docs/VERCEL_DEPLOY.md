@@ -16,9 +16,10 @@ team `deependra2`). Sign-in page: <https://teacher-admin-website.vercel.app/ERP.
 - `vercel.json`: install (`cd backend && npm ci`), build (`cd backend && npm run build`, TypeScript → `backend/dist`),
   static folder, rewrites, region `bom1` (Mumbai) and basic security headers.
 - `api/index.mjs`: imports `createApp` from `backend/dist` and exports the Express app as the function. It adds the
-  deployment's own `https://` Vercel URLs to the allowed CORS origins, and loads `firebase-admin` only when
-  `FIREBASE_MODE` is not `disabled` (see the Admin SDK note below).
-- `package.json` (root): only pins Node.js `22.x`, matching `backend/package.json` (`>=22 <24`).
+  deployment's own `https://` Vercel URLs to the allowed CORS origins and, only when `FIREBASE_MODE` is not
+  `disabled`, prepares and loads `firebase-admin` (see "Real teacher sign-in on Vercel").
+- `package.json` (root): pins Node.js `22.x`, matching `backend/package.json` (`>=22 <24`), and runs the entry's
+  tests (`npm test` → `tests/vercel-entry.test.mjs`; build the backend first: `cd backend && npm ci && npm run build`).
 - `.vercelignore`: keeps secrets, the Android/Gradle project, PDFs, docs and tests out of the upload. Everything left
   in `teacher-website/` is public, so `teacher-website/docs`, `tests`, `README.md` and `package.json` are excluded.
   Do not remove the secret lines (`.env*`, `.vercel`, key files).
@@ -56,39 +57,50 @@ Applications → Installed GitHub Apps → Vercel → Configure → Repository a
 | `/` | Teacher dashboard (labelled demo data) |
 | `/ERP.html` | Teacher sign-in page; "Continue in explicit DEMO Mode" works |
 | `/api/health` | `200` `{"status":"ok","service":"smartattend-teacher-api",…}` |
-| `/firebase-config.js` | `window.__SMARTATTEND_FIREBASE__ = {"enabled":false};` (no-store) |
-| `/api/me` | `503` `FIREBASE_NOT_CONFIGURED` (fail-closed while Firebase is disabled) |
+| `/firebase-config.js` | Firebase off: `{"enabled":false}`; on: `{"enabled":true,"firebaseOptions":{…}}` (no-store) |
+| `/api/me` | Firebase off: `503` `FIREBASE_NOT_CONFIGURED`; on: `401` `AUTHENTICATION_REQUIRED` without a token |
 
 ## Environment variables
 
 Set them in Vercel → Project → Settings → Environment Variables (same names as `backend/.env.example`), then
-redeploy. None are needed for the current deployment.
+redeploy. With none set, Firebase is off and only explicit Demo Mode works.
 
-- `FIREBASE_MODE`: unset = `disabled`. Real teacher sign-in is off and only explicit Demo Mode works.
+- `FIREBASE_MODE`: unset = `disabled`; `adc` = real teacher sign-in (next section).
 - `ALLOWED_ORIGINS`: extra browser origins, comma-separated. The deployment's own Vercel URLs are already allowed;
   add a custom domain here only if it is not the project's main production domain.
 - `JSON_LIMIT`: request body limit, default `100kb`.
 
-## Real teacher sign-in on Vercel (not enabled yet)
+## Real teacher sign-in on Vercel
 
-`FIREBASE_MODE=adc` uses Google Application Default Credentials. A Vercel Function has none (no `gcloud` login, no
-Google metadata server), and service-account key files must never be committed. Do not set `FIREBASE_MODE=adc` on
-Vercel yet: the site would load, but every teacher authorization would fail (fail-closed).
+How `api/index.mjs` makes the backend's `adc` mode work in a Vercel Function:
 
-The Admin SDK also does not load on Vercel yet: `firebase-admin` 14 → `jwks-rsa` 4 `require()`s the ESM-only
-`jose` 6, which works on Node.js 22.12+ locally but fails in Vercel's Node.js 22 runtime with `ERR_REQUIRE_ESM`
-(first deployment, 3 Nov 2026). Reproduce locally with
-`node --no-experimental-require-module`. That is why `api/index.mjs` imports it only when Firebase is enabled.
+- **Credential.** A Vercel Function has no Google Application Default Credentials (no `gcloud` login, no metadata
+  server). The service-account key is stored as the encrypted, sensitive Vercel variable
+  `FIREBASE_SERVICE_ACCOUNT_KEY` (the key JSON, or that JSON in base64). At start-up it is checked (`type` must be
+  `service_account`, `project_id` must equal `FIREBASE_PROJECT_ID`), written to a private temp file and named by
+  `GOOGLE_APPLICATION_CREDENTIALS`, the standard ADC key-file setting. The key is never committed, and errors never
+  quote it.
+- **Loading `firebase-admin`.** Vercel starts Node.js with `--no-experimental-require-module` (seen on Node 22.23.4 and
+  24.22.2), so CommonJS cannot `require()` ES modules there. `firebase-admin` 14 → `jwks-rsa` 4 `require()`s the
+  ESM-only `jose` 6, which fails with `ERR_REQUIRE_ESM`. The entry imports `jose` as ESM first and puts it in the
+  CommonJS module cache, where `require('jose')` finds it; where Node can do this itself (local runs) nothing changes.
+  `tests/vercel-entry.test.mjs` runs the entry with the same flag; a preview deployment with Firebase on answered
+  `/api/me` with a fake token as `401 INVALID_TOKEN` (3 Nov 2026).
 
-To enable it later:
+To turn it on (or after rotating the key):
 
-1. Make the function load `firebase-admin` on Vercel (for example bundle `api/index.mjs` with esbuild, or try the
-   Node.js 24 runtime) and check `/api/me` on a preview deployment.
-2. Give the backend a credential that works on Vercel. Recommended: Vercel OIDC federation with a Google Cloud
-   Workload Identity Pool (keyless, needs a small backend change to build the credential). Avoid key files.
+1. Firebase Console → project `smartattend-2a5ce` → Project settings → General → Your apps → Web app: copy
+   `apiKey`, `authDomain`, `appId` (and `storageBucket`, `messagingSenderId`). These are public values.
+2. Project settings → Service accounts → Generate new private key. Upload the downloaded JSON file (outside this
+   repository) as a sensitive variable, then delete the file:
+   `Get-Content <key.json> -Raw | npx vercel@latest env add FIREBASE_SERVICE_ACCOUNT_KEY production --sensitive -Q "$env:USERPROFILE\.vercel-deependra"`
 3. Set `FIREBASE_MODE=adc`, `FIREBASE_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_API_KEY`,
-   `FIREBASE_WEB_AUTH_DOMAIN`, `FIREBASE_WEB_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_APP_ID` and optionally
-   `FIREBASE_WEB_STORAGE_BUCKET`, `FIREBASE_WEB_MESSAGING_SENDER_ID`.
-4. Add the Vercel domain in Firebase Console → Authentication → Settings → Authorized domains (and to the Web API
-   key's HTTP-referrer restrictions, if the key is restricted).
-5. Redeploy and follow `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
+   `FIREBASE_WEB_AUTH_DOMAIN`, `FIREBASE_WEB_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_APP_ID`,
+   `FIREBASE_WEB_STORAGE_BUCKET`, `FIREBASE_WEB_MESSAGING_SENDER_ID` for Production.
+4. Firebase Console → Authentication → Settings → Authorized domains: add `teacher-admin-website.vercel.app` (and the
+   domain in the Web API key's HTTP-referrer restrictions, if the key is restricted).
+5. Redeploy, then sign in on `/ERP.html` with a teacher account that has a complete `users/{uid}` profile
+   (`docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`).
+
+To turn it off again, remove `FIREBASE_MODE` (or set it to `disabled`) and redeploy. Revoke a leaked key in Google
+Cloud Console → IAM → Service accounts → Keys.

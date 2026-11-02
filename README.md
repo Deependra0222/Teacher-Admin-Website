@@ -79,8 +79,9 @@ push to `main` deploys to production. For a manual deploy this PC keeps a separa
 npx vercel@latest deploy --prod --yes -Q "$env:USERPROFILE\.vercel-deependra"
 ```
 
-Firebase stays disabled on Vercel (explicit Demo Mode only) until the backend has a credential that works there.
-See `docs/VERCEL_DEPLOY.md` for what is deployed, how to check it, and the environment variables.
+Real teacher sign-in on Vercel is switched on with environment variables (Firebase Web App values plus the
+service-account key as an encrypted variable); without them the site runs in explicit Demo Mode only. See
+`docs/VERCEL_DEPLOY.md` for what is deployed, how to check it, and the environment variables.
 
 ## Project structure
 

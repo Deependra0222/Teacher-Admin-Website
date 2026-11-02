@@ -140,7 +140,7 @@
     if(storedMessage)showLoginStatus(storedMessage);
     if(!auth.firebaseConfigured){
       if(submit)submit.disabled=true;
-      showLoginStatus(auth.initializationError?.message||'Firebase Web sign-in is not configured on this local server. Demo Mode remains available.');
+      showLoginStatus(auth.initializationError?.message||'Teacher sign-in is not enabled on this site yet. Demo Mode remains available.');
     }
     form?.addEventListener('submit',async event=>{
       event.preventDefault();if(!form.reportValidity()||!submit)return;

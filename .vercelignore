@@ -41,6 +41,7 @@ backend/.firebase
 # Docs, guides and tests that are not part of the website
 /docs/
 /teacher-dashboard/
+/tests/
 teacher-website/docs/
 teacher-website/tests/
 teacher-website/README.md
