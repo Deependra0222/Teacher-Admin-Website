@@ -1,0 +1,9 @@
+{
+  "name": "smartattend-vercel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vercel entry for the SmartAttend teacher website and backend. See docs/VERCEL_DEPLOY.md.",
+  "engines": {
+    "node": "22.x"
+  }
+}

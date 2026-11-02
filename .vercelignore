@@ -1,0 +1,51 @@
+# Files the Vercel CLI must not upload. Only teacher-website/ (static pages), api/ and backend/
+# are needed for the deployment; everything in teacher-website/ is served publicly.
+
+# Secrets and local Vercel state (never remove these lines)
+.vercel
+**/.env
+**/.env.*
+**/google-services.json
+**/*service-account*.json
+**/*service_account*.json
+**/*firebase-adminsdk*.json
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Local installs and build output (Vercel installs and builds itself)
+**/node_modules
+backend/dist
+backend/*.log
+backend/.firebase
+
+# Android app and Gradle
+/app/
+/gradle/
+/gradlew
+/gradlew.bat
+/build.gradle.kts
+/settings.gradle.kts
+/gradle.properties
+/build-smartattend.bat
+/.gradle*/
+/.kotlin/
+/.idea/
+/.toolchains/
+*.apk
+*.aab
+
+# Docs, guides and tests that are not part of the website
+/docs/
+/teacher-dashboard/
+teacher-website/docs/
+teacher-website/tests/
+teacher-website/README.md
+teacher-website/package.json
+backend/tests/
+/*.pdf
+/SmartAttend_Codex_*
+/.superpowers/

@@ -68,6 +68,18 @@ npm start
 
 Open `http://localhost:3000/` for the website, `http://localhost:3000/ERP.html` for the teacher sign-in preview, and `http://localhost:3000/api/health` for the backend health check. See `backend/README.md` for beginner instructions and Firebase Milestone 2 boundaries.
 
+## Deploy the Teacher Website to Vercel
+
+`vercel.json` deploys `teacher-website/` as static pages and runs the Express backend as one Vercel Function
+(`api/index.mjs`). From the project folder:
+
+```powershell
+npx vercel@latest deploy --prod --yes
+```
+
+Firebase stays disabled on Vercel (explicit Demo Mode only) until the backend has a credential that works there.
+See `docs/VERCEL_DEPLOY.md` for what is deployed, how to check it, and the environment variables.
+
 ## Project structure
 
 - `app/src/main/java/com/smartattend/app/core` — student/domain models.
@@ -80,6 +92,7 @@ Open `http://localhost:3000/` for the website, `http://localhost:3000/ERP.html` 
 - `teacher-website/` — uploaded improved multi-page HTML/CSS/JavaScript demo, including its protected `original/` backup.
 - `backend/` — tested Node.js/Express/TypeScript local foundation; Firebase Admin is installed but not initialized.
 - `docs/` and `firestore.rules` — design and future backend readiness documents; not a deployed production backend.
+- `vercel.json`, `api/index.mjs`, root `package.json`, `.vercelignore` — Vercel deployment of the teacher website and backend (`docs/VERCEL_DEPLOY.md`).
 
 ## Future milestones
 
