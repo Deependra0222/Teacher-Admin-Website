@@ -3,8 +3,8 @@
 The teacher website and its Express backend run on Vercel as static pages plus one Vercel Function.
 The Android app is not part of the deployment.
 
-Live: <https://teacher-admin-website.vercel.app> (Vercel project `teacher-admin-website`, team
-`harshraj333555s-projects`). Sign-in page: <https://teacher-admin-website.vercel.app/ERP.html>.
+Live: <https://teacher-admin-website.vercel.app> (Vercel project `teacher-admin-website` in deependra0222's Vercel
+team `deependra2`). Sign-in page: <https://teacher-admin-website.vercel.app/ERP.html>.
 
 ## What gets deployed
 
@@ -27,16 +27,27 @@ The backend code is unchanged: local preview is still `cd backend && npm run dev
 
 ## Deploy from this PC
 
+This repository deploys from **deependra0222's** Vercel account only. Commits must be authored by
+`deependra0222 <deependrabandoliya8@gmail.com>` (set in the clone's local git config): on the Hobby plan Vercel
+refuses a deployment whose commit author is not on the Vercel team.
+
+The Vercel CLI on this PC is logged in to another account by default, so this repository keeps its own CLI login in
+`%USERPROFILE%\.vercel-deependra` (`-Q` is short for `--global-config`):
+
 ```powershell
-npx vercel@latest deploy --prod --yes
+npx vercel@latest login -Q "$env:USERPROFILE\.vercel-deependra"     # once
+npx vercel@latest whoami -Q "$env:USERPROFILE\.vercel-deependra"    # must print the deependra0222 account
+npx vercel@latest deploy --prod --yes -Q "$env:USERPROFILE\.vercel-deependra"
 ```
 
-The first run links the folder to the Vercel project `teacher-admin-website` (it writes `.vercel/`, which git
-ignores). On the Vercel Hobby plan a CLI deploy is accepted only when the HEAD commit's author is a member of the
-Vercel team, so commit with the git identity of the Vercel account before deploying.
+The CLI writes `.vercel/` (project link) and `.env.local` (a short-lived `VERCEL_OIDC_TOKEN`); git ignores both.
 
-The Vercel project is not connected to the GitHub repository: a `git push` does not deploy by itself. To deploy on
-every push, connect the repository in Vercel → Project → Settings → Git.
+### Deploy on every push (one-time browser step)
+
+The CLI could not connect the GitHub repository by itself. Signed in to Vercel as deependra0222: project
+`teacher-admin-website` → Settings → Git → Connect Git Repository → GitHub → install / authorize the Vercel GitHub
+App on the `Deependra0222` GitHub account with access to `Teacher-Admin-Website` → select the repository. After that
+every push to `main` deploys to production. Until then a `git push` does not deploy.
 
 ## Check a deployment
 
