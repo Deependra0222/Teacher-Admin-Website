@@ -42,12 +42,12 @@ npx vercel@latest deploy --prod --yes -Q "$env:USERPROFILE\.vercel-deependra"
 
 The CLI writes `.vercel/` (project link) and `.env.local` (a short-lived `VERCEL_OIDC_TOKEN`); git ignores both.
 
-### Deploy on every push (one-time browser step)
+### Deploy on every push
 
-The CLI could not connect the GitHub repository by itself. Signed in to Vercel as deependra0222: project
-`teacher-admin-website` → Settings → Git → Connect Git Repository → GitHub → install / authorize the Vercel GitHub
-App on the `Deependra0222` GitHub account with access to `Teacher-Admin-Website` → select the repository. After that
-every push to `main` deploys to production. Until then a `git push` does not deploy.
+The Vercel project is connected to the GitHub repository `Deependra0222/Teacher-Admin-Website` (production branch
+`main`): every push to `main` deploys to production and other branches get preview deployments. This needs the
+Vercel GitHub App on the `Deependra0222` GitHub account to keep access to this repository (GitHub → Settings →
+Applications → Installed GitHub Apps → Vercel → Configure → Repository access).
 
 ## Check a deployment
 

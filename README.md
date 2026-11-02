@@ -71,8 +71,9 @@ Open `http://localhost:3000/` for the website, `http://localhost:3000/ERP.html` 
 ## Deploy the Teacher Website to Vercel
 
 Live: <https://teacher-admin-website.vercel.app>. `vercel.json` deploys `teacher-website/` as static pages and runs
-the Express backend as one Vercel Function (`api/index.mjs`). It deploys from deependra0222's Vercel account; this
-PC keeps a separate Vercel CLI login for it (see `docs/VERCEL_DEPLOY.md`). From the project folder:
+the Express backend as one Vercel Function (`api/index.mjs`). It deploys from deependra0222's Vercel account: every
+push to `main` deploys to production. For a manual deploy this PC keeps a separate Vercel CLI login (see
+`docs/VERCEL_DEPLOY.md`); from the project folder:
 
 ```powershell
 npx vercel@latest deploy --prod --yes -Q "$env:USERPROFILE\.vercel-deependra"
