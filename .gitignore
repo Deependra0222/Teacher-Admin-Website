@@ -16,6 +16,10 @@ backend/dist/
 backend/.env
 backend/.env.*
 !backend/.env.example
+backend/firebase-debug.log
+backend/firestore-debug.log
+backend/ui-debug.log
+backend/.firebase/
 *.jks
 *.keystore
 .superpowers/

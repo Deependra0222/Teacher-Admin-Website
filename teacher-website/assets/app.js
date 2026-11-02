@@ -109,6 +109,9 @@
   function paintRealMode(session,assignments){
     const badge=$('.demo-badge');
     if(badge)badge.textContent='● FIREBASE TEACHER · AUTHORIZED';
+    const sideNote=$('.side-note');
+    if(sideNote)sideNote.innerHTML='<strong>● Secure teacher session</strong>Firebase identity and the backend teacher role are authorized. Attendance synchronization is not active.';
+    const eyebrow=$('.intro .eyebrow');if(eyebrow)eyebrow.textContent='Teacher workspace • authenticated Firebase session';
     const intro=$('.intro p');
     if(intro)intro.textContent=`Authenticated as ${session.teacher.name} · ${session.teacher.department}. Milestone 2 exposes only the authorized teacher profile and assignment scope; attendance data is not connected yet.`;
     const notice=$('.notice-strip span:last-child');
@@ -118,6 +121,9 @@
     const tableTargets=[['#dashboardStudents',6],['#studentsTable',6],['#timetableTable',6],['#presenceTable',6],['#correctionsTable',6],['#reportTable',6]];
     tableTargets.forEach(([selector,columns])=>{const body=$(selector);if(body)body.innerHTML=`<tr><td colspan="${columns}" class="empty-cell">${empty}</td></tr>`;});
     ['#studentCount','#averageAttendance','#atRiskCount','#reportTotal','#reportAverage','#reportRisk','#pendingCorrections'].forEach(selector=>{const node=$(selector);if(node)node.textContent='—';});
+    const metricLabels=[['#studentCount','Real students loaded'],['#averageAttendance','Official attendance'],['#atRiskCount','Attendance shortage'],['#scheduledClasses','Authorized assignments']];
+    metricLabels.forEach(([selector,label])=>{const value=$(selector),metric=value?.closest('.metric');if(metric){const title=$('.metric-top',metric),detail=$('small',metric);if(title)title.childNodes[0].textContent=label;if(detail)detail.textContent='Not connected in Milestone 2';}});
+    $$('.quick-link').forEach(link=>{link.setAttribute('aria-disabled','true');link.style.pointerEvents='none';});
     const scheduled=$('#scheduledClasses');if(scheduled)scheduled.textContent=String(assignments.length);
     const schedule=$('#todaySchedule');if(schedule)schedule.innerHTML=assignments.length?assignments.map(item=>`<div class="schedule-item"><span class="time-chip">Assigned</span><div><strong>${safe(item.subjectId)}</strong><small>${safe(item.batchId)}${item.academicYear?` · ${safe(item.academicYear)}`:''}</small></div><span class="pill muted">Authorized scope</span></div>`).join(''):'<p class="empty-cell">No active teacher assignments were found. Access was not broadened to other students or batches.</p>';
     const sessionBanner=$('#sessionBanner');if(sessionBanner)sessionBanner.textContent='No real class session is active. Session synchronization is outside Milestone 2.';

@@ -18,12 +18,12 @@ async function createFirebaseGateway(configuration) {
 
   const app = appSdk.initializeApp(configuration.firebaseOptions);
   const auth = authSdk.getAuth(app);
-  await authSdk.setPersistence(auth, authSdk.browserSessionPersistence);
   if (configuration.authEmulatorUrl) {
     authSdk.connectAuthEmulator(auth, configuration.authEmulatorUrl, {
       disableWarnings: true,
     });
   }
+  await authSdk.setPersistence(auth, authSdk.browserSessionPersistence);
 
   const initialUser = new Promise((resolve, reject) => {
     const unsubscribe = authSdk.onAuthStateChanged(

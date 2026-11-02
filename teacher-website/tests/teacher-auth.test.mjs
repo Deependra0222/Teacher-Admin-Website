@@ -168,6 +168,23 @@ describe("teacher session separation", () => {
     assert.equal(storage.getItem("smartattend_teacher_demo_session"), null);
     assert.deepEqual(firebase.calls, [["signOut"]]);
   });
+
+  test("delegates password reset to Firebase without changing the session mode", async () => {
+    const storage = new MemoryStorage();
+    const firebase = fakeGateway();
+    const controller = createTeacherSessionController({
+      storage,
+      firebaseGateway: firebase.gateway,
+      backendClient: { authorize: async () => ({}) },
+    });
+
+    await controller.sendPasswordReset("teacher@example.edu");
+
+    assert.deepEqual(firebase.calls, [
+      ["sendPasswordReset", "teacher@example.edu"],
+    ]);
+    assert.equal(storage.getItem("smartattend_teacher_demo_session"), null);
+  });
 });
 
 describe("protected backend client", () => {
