@@ -12,7 +12,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --import tsx --test tests/app.test.ts tests/teacher-authorization.test.ts"
+    "test": "node --import tsx --test tests/app.test.ts tests/firebase-runtime.test.ts tests/teacher-authorization.test.ts"
   },
   "dependencies": {
     "cors": "2.8.6",

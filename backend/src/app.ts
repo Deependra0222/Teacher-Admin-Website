@@ -6,6 +6,7 @@ import {
   createRequireTeacher,
   writeTeacherAuthorizationError,
 } from "./middleware/require-teacher.js";
+import type { FirebaseWebConfig } from "./firebase/config.js";
 
 export interface AppConfig {
   readonly allowedOrigins: readonly string[];
@@ -13,6 +14,7 @@ export interface AppConfig {
   readonly jsonLimit?: string;
   readonly now?: () => Date;
   readonly teacherAuthorization?: TeacherAuthorizationService;
+  readonly firebaseWebConfig?: FirebaseWebConfig;
 }
 
 class ApiError extends Error {
@@ -67,6 +69,37 @@ export function createApp(config: AppConfig): Express {
       service: "smartattend-teacher-api",
       timestamp: now().toISOString(),
     });
+  });
+
+  app.get("/firebase-config.js", (_request, response) => {
+    const web = config.firebaseWebConfig;
+    const payload =
+      web === undefined
+        ? { enabled: false }
+        : {
+            enabled: true,
+            firebaseOptions: {
+              apiKey: web.apiKey,
+              authDomain: web.authDomain,
+              projectId: web.projectId,
+              appId: web.appId,
+              ...(web.storageBucket === undefined
+                ? {}
+                : { storageBucket: web.storageBucket }),
+              ...(web.messagingSenderId === undefined
+                ? {}
+                : { messagingSenderId: web.messagingSenderId }),
+            },
+            ...(web.authEmulatorUrl === undefined
+              ? {}
+              : { authEmulatorUrl: web.authEmulatorUrl }),
+          };
+    const serialized = JSON.stringify(payload).replaceAll("<", "\\u003c");
+    response
+      .status(200)
+      .set("Cache-Control", "no-store")
+      .type("application/javascript")
+      .send(`window.__SMARTATTEND_FIREBASE__ = ${serialized};\n`);
   });
 
   const requireTeacher = createRequireTeacher(config.teacherAuthorization);
