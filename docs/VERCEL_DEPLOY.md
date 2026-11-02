@@ -3,6 +3,9 @@
 The teacher website and its Express backend run on Vercel as static pages plus one Vercel Function.
 The Android app is not part of the deployment.
 
+Live: <https://teacher-admin-website.vercel.app> (Vercel project `teacher-admin-website`, team
+`harshraj333555s-projects`). Sign-in page: <https://teacher-admin-website.vercel.app/ERP.html>.
+
 ## What gets deployed
 
 | Part | Where it comes from | How Vercel serves it |

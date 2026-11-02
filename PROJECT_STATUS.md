@@ -8,7 +8,15 @@ The approved **SmartAttend Student Android App milestone remains implemented and
 
 `D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
 
-All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The teacher portal now performs real Firebase Authentication and server-side teacher authorization when configured, while its attendance/business screens remain unconnected. No Firestore write, official attendance change, Android synchronization, BLE scan, ESP32 signal, deployment, or teacher finalization is claimed.
+All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The teacher portal now performs real Firebase Authentication and server-side teacher authorization when configured, while its attendance/business screens remain unconnected. No Firestore write, official attendance change, Android synchronization, BLE scan, ESP32 signal, or teacher finalization is claimed. The teacher website and backend are deployed to Vercel with Firebase **disabled** (explicit Demo Mode only), see below.
+
+## Vercel deployment (2026-11-03)
+
+- Live: https://teacher-admin-website.vercel.app (Vercel project `teacher-admin-website`, team `harshraj333555s-projects`, region `bom1`, Node.js 22). Deployed from the CLI with `npx vercel@latest deploy --prod --yes`; the GitHub repository is not connected to the Vercel project, so a push does not deploy.
+- Added `vercel.json` (install/build `backend/`, static `teacher-website/`, rewrites `/api/*` and `/firebase-config.js` to the function, security headers), `api/index.mjs` (the unchanged Express app from `backend/dist` as one Vercel Function; the deployment's own Vercel URLs are allowed CORS origins), a root `package.json` pinning Node.js `22.x`, `.vercelignore` and `docs/VERCEL_DEPLOY.md`.
+- The first deployment crashed every API request: `firebase-admin` → `jwks-rsa` 4 `require()`s the ESM-only `jose` 6, which Vercel's Node.js 22 runtime refuses (`ERR_REQUIRE_ESM`). `api/index.mjs` now loads the Admin runtime only when `FIREBASE_MODE` is not `disabled`. Reproduced and verified locally with `node --no-experimental-require-module`.
+- Tests run: backend `npm test` **54/54**; local check of `api/index.mjs` (health, config, `/api/me` 503, API 404, CORS own/other origin) **7/7** with and without `require(esm)`; live checks after the second deployment: pages 200, `/api/health` 200, `/firebase-config.js` `{"enabled":false}` with `no-store`, `/api/me` and `/api/teacher/assignments` 503 `FIREBASE_NOT_CONFIGURED`, unknown API route 404, foreign `Origin` 403; `teacher-website/docs`, `tests`, `README.md` and `package.json` return 404. Headless Chrome rendered `ERP.html` with "Demo Mode remains available".
+- Blocker for live teacher sign-in on Vercel: the Admin SDK does not load there yet (see above) and `FIREBASE_MODE=adc` has no Application Default Credentials in a Vercel Function. Next action: bundle or otherwise fix the function's `firebase-admin` load, then add a keyless credential (Vercel OIDC + Google Cloud Workload Identity Federation) — steps in `docs/VERCEL_DEPLOY.md`.
 
 ## Real Firebase teacher-login test preparation completed
 
