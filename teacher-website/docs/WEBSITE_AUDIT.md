@@ -1,5 +1,7 @@
 # Original Website Audit & Improvements Made
 
+> Milestone 2 update (2026-11-02): the observations below remain the historical audit of the submitted original/demo package. The improved `ERP.html` is now connected to Firebase Email/Password Authentication and an Express/Firebase Admin teacher-role check. Attendance and the other business screens remain unconnected; see `../README.md` and `../../backend/README.md` for current status.
+
 **Uploaded original:** `smart_attendance.zip` containing 9 files (5 HTML, 2 CSS, 2 JavaScript).
 
 ## Issues found in the ORIGINAL

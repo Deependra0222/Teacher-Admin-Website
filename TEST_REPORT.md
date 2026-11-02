@@ -2,6 +2,129 @@
 
 Updated: 2026-11-02 (Asia/Calcutta)
 
+## Teacher Website / Firebase Authentication Milestone 2
+
+### Outcome
+
+Milestone 2 is implemented and verified against Firebase Authentication and Cloud Firestore emulators. The website now performs Firebase Email/Password sign-in and the Express backend independently verifies the ID token, exact teacher role/profile, and UID-scoped active assignments. No production deployment, production rule change, official attendance write, Android change, or ESP32/BLE work occurred.
+
+Live login to the existing `smartattend-e9a35` project was **not run** because this workspace does not contain the Firebase Web App configuration, local Application Default Credentials, or an administrator-provisioned teacher test account/profile. This is the remaining external configuration boundary, not an emulator/build failure.
+
+### Actual automated results
+
+| Command/check | Result | Evidence |
+|---|---|---|
+| `backend: npm ci` | PASS WITH ADVISORIES | Clean lockfile install added 704 packages; 16 moderate, 0 high, 0 critical advisories. |
+| `backend: npm test` | PASS | 44 assertions across 6 suites; 0 failures. |
+| `backend: npm run typecheck` | PASS | Strict TypeScript check exited 0. |
+| `backend: npm run build` | PASS | TypeScript compilation exited 0 and refreshed `backend/dist/`. |
+| `backend: npm run test:emulators` | PASS | 12 assertions; 0 failures; Auth and Firestore emulators shut down cleanly. |
+| `teacher-website: npm test` | PASS | 10 assertions across 3 suites; 0 failures. |
+| Website syntax | PASS | `node --check` passed for `assets/app.js`, `assets/teacher-auth.js`, and `assets/teacher-auth-core.js`. |
+| Compiled disabled-mode server | PASS | `/api/health`, `/firebase-config.js`, and `/ERP.html` returned 200; config returned `enabled:false` with `Cache-Control: no-store`; protected `/api/me` failed closed with 503 `FIREBASE_NOT_CONFIGURED`. |
+| Protected original backup | PASS | All 9 `teacher-website/original/` SHA-256 values still match the Milestone 1 baseline. |
+| Protected project boundaries | PASS | Git diff against `codex/teacher-backend-m1` is empty for `app/`, `teacher-dashboard/`, `teacher-website/original/`, and `firestore.rules`. |
+| Website local links | PASS | Static scan found 0 missing top-level local HTML/CSS/JavaScript targets. |
+| Secret-pattern scan | PASS | No private-key/service-account/test-password pattern was found outside ignored/generated dependencies and Android's ignored config. |
+| Older `teacher-dashboard` regression | PASS | 3 tests; 0 failures. |
+| Android JVM regression | PASS | `build-smartattend.bat testDebugUnitTest --no-daemon` completed successfully; 27 tasks were up-to-date. |
+| Whitespace check | PASS | `git diff --check` reported no whitespace errors before documentation updates. |
+
+Backend unit tests cover safe Firebase runtime configuration, public Web config serialization, Admin adapters, missing/malformed Bearer headers, invalid/expired/revoked tokens, missing/incomplete/inactive/wrong-role profiles, authorized `/api/me`, empty assignments, verified-UID assignment scoping, malformed authorization data, and upstream service failure.
+
+Emulator tests use only project ID `demo-smartattend` and cover:
+
+- correct Firebase teacher account plus complete `users/{uid}` profile;
+- incorrect password at Firebase Authentication;
+- student denial;
+- missing Firestore profile;
+- incorrectly capitalized role denial;
+- missing and invalid ID tokens;
+- authorized empty assignment result;
+- only active assignments for the verified teacher UID, ignoring a query-supplied UID;
+- current `firestore.rules` denying unauthenticated and cross-student profile reads while permitting the student's own profile read;
+- successful authorization after the backend Firebase runtime is closed and recreated.
+
+### Actual interactive browser results
+
+The website was served at `http://localhost:3000` and connected to local Auth/Firestore emulators. The browser test verified:
+
+- disabled mode clearly disables real sign-in while preserving the explicit Demo Mode action;
+- explicit Demo Mode opens the existing labeled local dashboard;
+- Exit Demo Mode clears that tab session and returns to login;
+- correct emulator teacher credentials reach the authenticated dashboard;
+- the authenticated shell shows the authorized teacher name/department and one UID-scoped assignment while hiding demo student rows;
+- a page reload restores the Firebase teacher session;
+- logout returns to login, and opening a protected page afterward redirects back with an authentication-required message;
+- incorrect password stays on login and shows `The email or password is incorrect.`;
+- a student Auth account is denied with `This account is not authorized for the teacher portal.`;
+- an Auth account without `users/{uid}` is denied with `No authorized teacher profile exists for this account.`;
+- the password-reset action succeeds against the Auth emulator;
+- no automatic Demo Mode fallback occurred in any failed real-login path.
+
+The first restoration run exposed a real ordering defect: `setPersistence()` initialized an existing Auth session before `connectAuthEmulator()`. Moving the emulator connection immediately after `getAuth()` fixed the issue; the full browser restoration and emulator suites then passed.
+
+### Authorization contract verified
+
+Teacher profile path: `users/{Firebase Authentication UID}`.
+
+Required non-empty strings: `role` (exactly `teacher`), `name`, `email`, and `department`. Optional `active` must be a boolean when present, and `false` denies access.
+
+Assignment path: `teacherAssignments/{assignmentId}`. Active results require string `teacherUid` matching the verified UID, non-empty string `subjectId`, non-empty string `batchId`, and boolean `active: true`; optional `academicYear` must be a non-empty string when present.
+
+### Files changed in Milestone 2
+
+Modified:
+
+- `.gitignore`
+- `PROJECT_PLAN.md`
+- `PROJECT_STATUS.md`
+- `TEST_REPORT.md`
+- `backend/.env.example`
+- `backend/README.md`
+- `backend/package-lock.json`
+- `backend/package.json`
+- `backend/src/app.ts`
+- `backend/src/config/environment.ts`
+- `backend/src/index.ts`
+- `teacher-website/ERP.html`
+- `teacher-website/README.md`
+- `teacher-website/assets/app.js`
+- `teacher-website/docs/BACKEND_ARCHITECTURE.md`
+- `teacher-website/docs/WEBSITE_AUDIT.md`
+
+New:
+
+- `backend/src/auth/teacher-authorization.ts`
+- `backend/src/firebase/admin-runtime.ts`
+- `backend/src/firebase/config.ts`
+- `backend/src/middleware/require-teacher.ts`
+- `backend/tests/firebase-emulator.integration.test.ts`
+- `backend/tests/firebase-runtime.test.ts`
+- `backend/tests/teacher-authorization.test.ts`
+- `firebase.json`
+- `teacher-website/assets/teacher-auth-core.js`
+- `teacher-website/assets/teacher-auth.js`
+- `teacher-website/package.json`
+- `teacher-website/tests/teacher-auth.test.mjs`
+- `docs/superpowers/specs/2026-11-02-teacher-firebase-authentication-design.md`
+- `docs/superpowers/plans/2026-11-02-teacher-firebase-authentication-implementation.md`
+
+No file in `teacher-website/original/`, `teacher-dashboard/`, the Android application, or `firestore.rules` was changed.
+
+### Dependency audit
+
+Final `npm audit --json`: 16 moderate, 0 high, and 0 critical advisories. `npm audit --omit=dev --json` reports 6 moderate transitive findings under Firebase Admin's Google Cloud dependencies; the additional findings come from Firebase CLI and its emulator/deployment utilities. npm's aggregate CLI suggestion is an inappropriate downgrade to Firebase CLI 3.18.2 from the installed current 15.34.2. No forced downgrade, override, or `npm audit fix --force` was applied.
+
+### Not run / intentionally stopped
+
+- Live teacher sign-in to the existing Firebase project.
+- Production Firestore rules modification or deployment.
+- Production Hosting/backend deployment or billing upgrade.
+- Real student/timetable/session/correction/notice/report synchronization.
+- Official attendance record creation or modification.
+- Android changes, Android-to-teacher synchronization, ESP32, or BLE hardware testing.
+
 ## Teacher Website / Node.js Backend Milestone 1
 
 | Check | Result | Evidence |

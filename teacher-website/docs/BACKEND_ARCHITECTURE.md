@@ -1,10 +1,12 @@
 # SmartAttend — Website, Android App, Firebase and BLE Integration Logic
 
+> Milestone 2 update (2026-11-02): Firebase teacher login, server-side ID-token verification, exact teacher profile authorization, and verified-UID assignment reads are now implemented and emulator/browser tested. The rest of this document remains the forward architecture; live-project teacher login and all attendance/business synchronization remain pending.
+
 ## 1. Present vs future states (very important)
 
-**Verified/observed:** Android student demo runs, its real Firebase email/password login and own Firestore `users/{uid}` profile authorization were successfully tested by the project owner. The uploaded *teacher website* is static; this improved copy is an explicitly local demo.
+**Verified/observed:** Android student demo runs, its real Firebase email/password login and own Firestore `users/{uid}` profile authorization were successfully tested by the project owner. The improved teacher website supports separate explicit Demo Mode and real Firebase teacher authentication through the local secured backend; the real-data pages remain unconnected.
 
-**Not yet verified/implemented as production:** teacher website Firebase login, live sessions, BLE scanning on actual Android hardware, ESP32 beacons, authenticated attendance evidence ingestion, official attendance finalization, realtime data sync between Android and website, correction approval in Firestore, notifications, audit logging and production deployment.
+**Not yet verified/implemented as production:** live-project teacher login with owner configuration/credentials, live sessions, BLE scanning on actual Android hardware, ESP32 beacons, authenticated attendance evidence ingestion, official attendance finalization, realtime data sync between Android and website, correction approval in Firestore, notifications, audit logging and production deployment.
 
 ## 2. Why Firebase is the backend
 

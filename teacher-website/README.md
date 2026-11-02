@@ -1,61 +1,48 @@
-# SmartAttend Teacher Portal — Improved Frontend Demo
+# SmartAttend Teacher Portal — Firebase Authentication Milestone
 
-This package is an **improved, functional local frontend prototype**, built from the submitted `smart_attendance.zip`. It is NOT the connected SmartAttend production backend or a live attendance system.
+This is the preserved improved teacher website, now connected to Firebase Email/Password Authentication and the local SmartAttend Express authorization backend.
 
-## What's included
+## Two intentionally separate modes
 
-- `index.html`: dashboard and demo KPIs, batch filters
-- `students.html`: student directory and shortage filters
-- `timetable.html`: day-selectable demo lecture/lab timetable
-- `live_class.html`: persistent **local-only** demo sessions; no BLE scanning or real attendance
-- `corrections.html`: explicitly simulated request approvals/rejections
-- `notices.html`: local demo announcements (not sent to students)
-- `report.html`: sample attendance graphs and demo CSV export
-- `ERP.html`: **non-functional production login form**, with explicit warning; no credentials transmitted or stored
-- `Setting.html`: local threshold settings and browser demo reset
-- `assets/demo-data.js`: fictional sample datasets
-- `assets/app.js`: shared demo logic, with error-safe page selectors, escaping and localStorage
-- `assets/style.css`: responsive styling
-- `original/`: all original HTML, CSS and JS files preserved for comparison
-- `docs/CODEX_MASTER_PROMPT.md`: implementation handoff to Codex
-- `docs/BACKEND_ARCHITECTURE.md`: end-to-end technical plan and critical security constraints
+- **Firebase teacher session:** Firebase authenticates the account; the Express backend verifies the ID token, reads `users/{uid}`, requires exact role `teacher`, and loads only active assignments for that verified UID. Local demo student/attendance records are hidden.
+- **Explicit Demo Mode:** starts only when the teacher clicks **Continue in explicit DEMO Mode**. It uses fictional browser-local records and remains labeled DEMO / NOT LIVE / NOT VERIFIED BY BLE.
 
-## To preview
+A failed Firebase sign-in never opens Demo Mode. A student, missing profile, wrong role, incomplete profile, invalid token, or backend failure is denied with a clear message.
 
-1. Unzip the folder. On Windows, open it in VS Code.
-2. Open a terminal in the folder and run:
-   `python -m http.server 8000`
-3. Visit `http://localhost:8000/index.html` in a browser.
-4. Navigate between the pages. Demo actions are browser-local, stored in localStorage.
-5. You can also open `index.html` directly, but a local web server is recommended and will be required when integrating ES modules and Firebase.
+## Preview
 
-## Important safety and honesty
+Run the backend; do not use `python -m http.server`, because the same-origin authentication APIs and runtime Firebase configuration come from Express.
 
-- **Do not enter real Firebase passwords into `ERP.html`**. The sign-in form is intentionally not connected.
-- Student records are fictional, generated locally, and are not your actual Firestore collection.
-- `live_class.html` does not receive ESP32 advertisements, verify presence, or update Android apps.
-- `corrections.html` and `notices.html` only modify your own browser's demo state.
-- Production attendance must be finalized by trusted backend code, not by browser JavaScript or Bluetooth RSSI alone.
-- This ZIP does **not** contain `google-services.json`, Firebase service account keys, real students or private credentials.
+```powershell
+cd "D:\Smart Attend\backend"
+npm ci
+npm run dev
+```
 
-## What to do for a real Firebase website
+Open:
 
-1. Keep your **existing** SmartAttend Firebase project, where your Android student login already works.
-2. Register a **Web App** in Firebase Project Settings / Add App / Web and retrieve the public Web SDK config. This is **not** the Android `google-services.json` file.
-3. The first teacher account must be created by an authorized administrator with `users/{uid}` role `teacher` and teacher–batch/subject assignment documents. Never let users choose their own roles.
-4. Implement actual `signInWithEmailAndPassword` and `onAuthStateChanged`, with teacher role/assignment validation before loading sensitive data.
-5. Maintain Firestore deny-by-default rules. Your current `allow get` for own `users/{uid}` does not authorize teacher dashboard queries.
-6. Test new Rules using the **Firebase Local Emulator Suite**, including negative tests for students, strangers, and unauthorized teachers.
-7. Implement trusted server-side operations (Cloud Functions or an equivalent secured server) for starting/end sessions, approving corrections and final attendance.
-8. Obtain explicit approval before enabling billing, deploying security rules, or hosting the website publicly. Cloud Functions deployment may require Blaze billing.
-9. Confirm backend field types and collection paths with the existing Kotlin Android project under `D:\Smart Attend` before changing shared schemas.
+```text
+http://localhost:3000/ERP.html
+```
 
-## Relationship to the student app
+With the default `FIREBASE_MODE=disabled`, real sign-in is disabled safely and explicit Demo Mode remains available. See `../backend/README.md` for emulator and existing-live-project setup.
 
-- Student app: Kotlin / Jetpack Compose; currently real Firebase email/password login and own profile reads work, but attendance/BLE remain demo.
-- Teacher portal in this ZIP: HTML/CSS/JS only (browser demo); Firebase integration NOT IMPLEMENTED.
-- Future: both use the **same** Firebase Auth tenant and Cloud Firestore database, with role-scoped access and trusted backend functions.
+## Browser security behavior
 
-## Primary next action
+- Uses the Firebase modular Web SDK from the official Google CDN.
+- Uses session persistence; the website does not manually save ID tokens.
+- Sends the current short-lived Firebase ID token only in the backend Authorization header.
+- Never stores passwords.
+- Clears any old Demo Mode marker before a real sign-in attempt.
+- Signs Firebase out when backend teacher authorization fails.
+- Restores an authorized teacher session after navigation/reopen within the browser session.
+- Provides Firebase logout and password-reset request actions.
+- Protects every non-login page with the same session/role check before enabling its mode.
 
-Give Codex `docs/CODEX_MASTER_PROMPT.md` plus this site folder and access to `D:\Smart Attend`. Ask for a staged audit and changes, not for blind rewrites. Do not paste passwords or service-account JSON into Codex.
+## Preserved design and files
+
+The existing blue-and-white layout, responsive navigation, page routes, and local demo interactions remain. `original/` was not modified; its nine Milestone 1 hashes still match. The older root `teacher-dashboard/` and the Student Android project are untouched by this website milestone.
+
+## Milestone boundary
+
+Real authentication is implemented, but timetable, student directory, live sessions, corrections, notices, reports, and official attendance are not connected to live records yet. In a real Firebase session those local demo datasets are hidden and controls remain inactive. No deployment or Firebase rules change was performed.

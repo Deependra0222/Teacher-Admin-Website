@@ -4,28 +4,32 @@ Updated: 2026-11-02 (Asia/Calcutta)
 
 ## Current outcome
 
-The approved **SmartAttend Student Android App milestone remains implemented and buildable**, the **Firebase student authentication milestone remains implemented**, and **Teacher Website / Node.js Backend Milestone 1 is complete and ready for review**. The generated Android debug APK remains:
+The approved **SmartAttend Student Android App milestone remains implemented and buildable**, the **Firebase student authentication milestone remains implemented**, and **Teacher Website / Node.js Backend Milestone 2 is complete and ready for review**. The generated Android debug APK remains:
 
 `D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
 
-All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The improved teacher pages are still browser-local demo screens. The new Express server does not initialize Firebase or authorize teachers. No Firestore write, synchronization, Android BLE scan, ESP32 signal, or teacher finalization is claimed.
+All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The teacher portal now performs real Firebase Authentication and server-side teacher authorization when configured, while its attendance/business screens remain unconnected. No Firestore write, official attendance change, Android synchronization, BLE scan, ESP32 signal, deployment, or teacher finalization is claimed.
 
-## Teacher Website / backend Milestone 1 completed
+## Teacher Website / backend Milestone 2 completed
 
-- Inspected the uploaded ZIP. Its actual contents match the supplied description: 9 improved HTML pages, 3 shared asset files, README, 3 documentation files, and the 9-file `original/` backup (25 files total).
-- Preserved the older `teacher-dashboard/` and the Android project unchanged.
-- Imported the uploaded package as `teacher-website/` and verified 25/25 working-tree SHA-256 hashes plus 25/25 committed Git-blob hashes against the ZIP extraction.
-- Added a path-scoped `.gitattributes` rule so Git cannot normalize the protected backup's CRLF bytes.
-- Added `backend/` using TypeScript 7.0.2, Express 5.3.0, Firebase Admin 14.5.0, CORS 2.8.6, dotenv 18.0.9, Supertest 7.3.1, tsx 4.23.15, and the Node test runner.
-- Added `GET /api/health`, an explicit CORS allowlist, a 100 KB default JSON limit, safe JSON/size/internal errors, JSON 404s for unknown APIs, and static serving of `teacher-website/`.
-- Firebase Admin is installed for the next milestone but is not imported or initialized. No Firebase Web config, ID-token check, teacher role, assignment query, or production record access was implemented.
-- Backend verification: `npm ci` completed; `npm test` passed 10/10; `npm run typecheck` passed; `npm run build` passed and produced `backend/dist/index.js`.
-- Live compiled-server verification: `http://localhost:3000/api/health`, `/`, and `/ERP.html` each returned HTTP 200; the dashboard title and teacher form were present. The temporary server was then stopped.
-- Website verification: 4/4 JavaScript syntax checks passed and 0 missing local HTML/CSS/JS links were found.
-- Regression verification: existing `teacher-dashboard` tests passed 3/3, and `build-smartattend.bat testDebugUnitTest --no-daemon` passed using the bundled JDK 17.
-- Actual host tooling: Node.js 23.11.0 and npm 11.4.2. The package targets Node.js 22-compatible behavior, but Node.js 22 was not installed/run during this verification. Firebase CLI is not installed globally.
-- Dependency audit: 6 moderate, 0 high, and 0 critical advisories remain transitively under Firebase Admin's Google Cloud dependencies. Plain `npm audit fix` could not resolve them; no unsafe forced major override was applied.
-- Not run: real teacher login, Firebase Admin initialization, Firebase Emulator Suite, Firestore reads/writes, production rules, interactive browser automation, deployment, or production attendance workflows.
+- Preserved the Milestone 1 Express foundation, older `teacher-dashboard/`, Student Android project, and every file in `teacher-website/original/`.
+- Added Firebase modular Web SDK authentication to the existing `ERP.html` UI. Email/password sign-in, password reset, session restoration, and logout are operational when configured.
+- Kept real login and Demo Mode separate. Demo Mode requires its explicit button; real login clears an old demo marker; a failed real login never opens Demo Mode.
+- The browser sends the short-lived Firebase ID token only in a Bearer header. It does not store passwords or manually persist tokens in application `localStorage`.
+- Added Firebase Admin runtime modes: `disabled` (safe default), `emulator`, and `adc` for the existing live project using Application Default Credentials.
+- Added strict Bearer-token middleware using `verifyIdToken(token, true)`, then reads exactly `users/{verifiedUid}`.
+- Teacher authorization requires exact lowercase `role: "teacher"` and nonblank string `name`, `email`, and `department`; optional boolean `active: false` denies access.
+- Added protected `GET /api/me` and `GET /api/teacher/assignments`. Assignment reads require `teacherUid == verified UID` and `active == true`; no assignments returns an empty list and never broadens scope.
+- Student, missing-profile, incomplete-profile, wrong-role, inactive, missing-token, invalid-token, expired-token, and revoked-token paths fail closed.
+- A real teacher session hides all local demo datasets and leaves unimplemented real-data controls inactive. Demo pages retain their existing labeled local interactions.
+- Added a no-cache `/firebase-config.js` endpoint that publishes only public Web App options. Admin credentials remain server-side.
+- Added Firebase CLI 15.34.2 as a development-only dependency plus isolated `demo-smartattend` Authentication/Firestore emulator tests. Root `firestore.rules` were loaded unchanged; no rule was deployed or weakened.
+- Automated verification: clean `npm ci` passed; backend 44/44 assertions; website 10/10 assertions; emulator 12/12 assertions; older teacher demo 3/3; Android JVM build/test regression passed; TypeScript typecheck/build and JavaScript syntax checks passed.
+- Browser verification against local emulators: correct teacher login, session restoration, assignment scope, logout, protected redirect, incorrect password, student denial, missing profile, password reset request, explicit Demo Mode, and Demo exit all passed.
+- Compiled-server smoke verification: health, runtime Web config, and login page returned 200; disabled config was non-cacheable; `/api/me` failed closed with 503 when Firebase was intentionally disabled.
+- Actual host tooling for final verification: Node.js 22.23.4, npm 10.9.9, Firebase CLI 15.34.2, and Android Studio bundled Java via `JAVA_HOME`.
+- Dependency audit: 16 moderate, 0 high, and 0 critical advisories remain in total. Six moderate transitive findings remain when development packages are omitted under Firebase Admin's Google Cloud dependencies; the additional findings come from Firebase CLI tooling. The suggested aggregate CLI downgrade is not appropriate; no forced audit change was applied.
+- Live existing-project teacher login was **not run** because this workspace still has no Firebase Web App configuration, Application Default Credentials, or owner-provisioned teacher test account/profile. Emulator proof is complete; live proof remains an external configuration step.
 
 ## Firebase authentication milestone completed
 
@@ -124,7 +128,8 @@ Current environment blocker: **none for building, linting, the offline app, Fire
 
 - Successful real-account sign-in/profile rendering with owner-entered credentials; password-reset email delivery; live missing-profile/wrong-role checks with controlled Firebase test users.
 - Firestore data synchronization beyond the single read-only student-profile authorization lookup, Security Rules emulator tests/deployment, Cloud Functions, and server finalization.
-- Teacher authentication, role/assignment authorization, and real teacher data beyond the verified local website/backend foundation.
+- Live-project teacher sign-in with owner-provisioned Web App config, ADC, Auth account, and complete `users/{uid}` teacher profile; emulator-backed authentication/authorization is verified.
+- Teacher business data beyond the authorized profile and assignment scope: students, timetable, sessions, corrections, notices, analytics, reports, and official attendance remain disconnected.
 - Android BLE permissions/scanning/service behavior, ESP32 firmware, RSSI calibration, and real signal-loss tests.
 - Real notifications/alarms; current notification settings and inbox records are offline app data only.
 - Physical-phone UI, accessibility, background/battery, OEM behavior, and installation testing.
@@ -132,4 +137,4 @@ Current environment blocker: **none for building, linting, the offline app, Fire
 
 ## Next major goal
 
-Stop for user review of Teacher Website / backend Milestone 1. Next, register a Firebase Web app in the existing SmartAttend project and implement **teacher Email/Password authentication plus server-side token, role, and assignment authorization**. Only after those negative and positive paths pass should real dashboard reads be connected. Android/teacher synchronization and ESP32/BLE hardware work remain later milestones.
+Stop for user review of Teacher Website / backend Milestone 2. The next manual step is to provide the existing Firebase Web App configuration through ignored `backend/.env`, configure local Application Default Credentials, and provision the first trusted teacher Auth/profile record. After live login is owner-verified, the next development milestone may connect teacher business data through assignment-scoped endpoints. Android/teacher synchronization and ESP32/BLE hardware work remain later milestones.

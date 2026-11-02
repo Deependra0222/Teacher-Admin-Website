@@ -5,7 +5,7 @@
 SmartAttend has two clients that will eventually share one Firebase backend:
 
 1. **Student Android application** — native Kotlin/Jetpack Compose app. This is the completed current milestone.
-2. **Teacher Admin Website** — the improved static portal and its local Express foundation are now preserved and verified; Firebase teacher authentication is next. The older `teacher-dashboard/` demo remains untouched.
+2. **Teacher Admin Website** — the improved portal, Express foundation, Firebase teacher authentication, server-side role/profile authorization, and UID-scoped assignment endpoint are preserved and verified with local emulators. The older `teacher-dashboard/` demo remains untouched.
 3. **Shared Firebase backend** — Authentication, secured Firestore records, Cloud Functions, audit logs, and synchronization for both clients.
 4. **ESP32/BLE integration** — Android scanning, measured RSSI calibration, real-device duration/loss tests, and secure server-side attendance finalization.
 
@@ -47,14 +47,17 @@ Status: **Implemented and automated/emulator failure-path verified; real owner a
 
 ## Milestone 3 — Teacher Admin Website
 
-Status: **Milestone 1 foundation completed; Milestone 2 Firebase teacher authentication pending review/configuration.**
+Status: **Milestone 2 Firebase teacher authentication completed and emulator/browser verified; live-project configuration and owner test pending.**
 
 - Preserved the existing `teacher-dashboard/` prototype unchanged.
-- Imported the 25-file improved website into `teacher-website/` without changing its HTML, CSS, JavaScript, navigation, demo labels, or protected `original/` backup.
+- Imported the 25-file improved website into `teacher-website/`, retained its premium design and navigation, and kept the protected `original/` backup byte-for-byte unchanged.
 - Added a Node.js 22-compatible, TypeScript/Express 5 foundation in `backend/` with static serving, health endpoint, strict CORS allowlist, bounded JSON parsing, safe API errors, tests, type checking, and production compilation.
-- Kept Firebase Admin installed but uninitialized; no Web SDK, Auth request, Firestore read/write, rules deployment, or production data exists in this milestone.
-- Next: register a Web app in the existing SmartAttend Firebase project, then implement teacher Email/Password login, ID-token verification, exact teacher-role checks, and assignment-scoped read APIs with negative authorization tests.
-- Later: connect timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings only through the secured shared backend.
+- Added Firebase Web Email/Password login, password reset, session restoration, logout, explicit separate Demo Mode, and protected-page guards.
+- Added Admin ID-token verification with revocation checking, exact `users/{uid}` teacher profile authorization, and active assignment reads bound to the verified UID.
+- Added disabled/emulator/ADC runtime modes; the browser receives only public Web configuration while Admin credentials stay server-side.
+- Verified positive and negative flows through Firebase Auth/Firestore emulators and a real browser. The unchanged production rules were not deployed.
+- Next manual boundary: existing-project Web App config, local ADC, and an administrator-provisioned teacher Auth/profile record for live owner verification.
+- Later: connect timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings only through secured assignment-scoped APIs.
 
 ## Firebase Android SDK foundation — Completed
 
@@ -65,9 +68,10 @@ Status: **Milestone 1 foundation completed; Milestone 2 Firebase teacher authent
 
 ## Milestone 4 — Shared Firebase backend
 
-Status: **Authentication/profile authorization client implemented; real-account success verification, synchronized app data, rules-emulator verification, and server logic remain pending.**
+Status: **Student and teacher authentication/profile authorization implemented; teacher flow emulator/rules verified; live teacher and student owner-account success plus synchronized app data remain pending.**
 
 - Verify the existing student account with owner-entered credentials and an administrator-created `users/{uid}` profile.
+- Owner-verify the teacher flow with the existing Firebase project, ignored Web config, ADC, and a trusted administrator-created teacher profile.
 - Extend student/teacher authorization only through trusted backend/admin workflows.
 - Implement secured Firestore collections and verified Security Rules.
 - Implement Cloud Functions for idempotent evidence processing, teacher actions, device registration, and final attendance.
