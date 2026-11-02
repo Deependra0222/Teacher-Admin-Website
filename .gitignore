@@ -11,6 +11,11 @@ captures/
 .cxx/
 app/google-services.json
 teacher-dashboard/firebase-config.js
+**/node_modules/
+backend/dist/
+backend/.env
+backend/.env.*
+!backend/.env.example
 *.jks
 *.keystore
 .superpowers/

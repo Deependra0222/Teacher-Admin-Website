@@ -1,0 +1,32 @@
+{
+  "name": "smartattend-teacher-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SmartAttend teacher portal API foundation",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <24"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test tests/app.test.ts"
+  },
+  "dependencies": {
+    "cors": "2.8.6",
+    "dotenv": "18.0.9",
+    "express": "5.3.0",
+    "firebase-admin": "14.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/node": "24.10.0",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}
