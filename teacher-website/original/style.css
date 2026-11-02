@@ -1,0 +1,308 @@
+/* Core Configurations */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    display: flex;
+    background-color: #c6d2dd;
+    color: #1e293b;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR STYLES */
+.sidebar {
+    width: 260px;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    padding: 2rem 0;
+    border-right: none;
+    transform: translateX(-260px);
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-left: 1rem;
+    margin-bottom: 3rem;
+}
+
+.brand-icon {
+    font-size: 1.5rem;
+}
+
+.sidebar-brand h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #4f46e5;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-links li {
+    margin-bottom: 0.5rem;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.nav-links a:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+.nav-links a.active {
+    background-color: #eedffc;
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+/* APP FRAMEWORK LAYOUT */
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevents flex items from breaking grid container sizing */
+}
+
+/* HEADER STYLES */
+header {
+    background-color: #ffffff;
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.toggle-btn {
+    background: #f1f5f9;
+    border: none;
+    font-size: 1.2rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #475569;
+    transition: background 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background: #e2e8f0;
+}
+
+.welcome-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.welcome-text p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: 0.15rem;
+}
+
+
+
+/* INTERFACE STAGE & CARDS */
+main {
+    padding: 2.5rem;
+    flex: 1;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.06);
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+}
+
+.card-badge-icon {
+    font-size: 1.5rem;
+    padding: 0.75rem;
+    border-radius: 16px;
+    display: inline-block;
+}
+/* Card Theme Variations */
+.card-purple .card-badge-icon { background: #f3e8ff; color: #7F63B0; }
+.card-purple { border-bottom: 4px solid #a78bfa; }
+
+.card-pink .card-badge-icon { background: #fce7f3; color: #db2777; }
+.card-pink { border-bottom: 4px solid #f472b6; }
+
+.card-blue .card-badge-icon { background: #e0f2fe; color: #5788B5; }
+.card-blue { border-bottom: 4px solid #5788B5; }
+
+.card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.card p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    flex: 1; /* Pushes the button cleanly to the bottom */
+}
+
+.card-btn {
+    width: 100%;
+    background-color: #0f172a;
+    color: #ffffff;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.card-purple .card-btn { background: #7F63B0; }
+.card-purple .card-btn:hover { background: #5d4782; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+
+.card-pink .card-btn { background: #db2777; }
+.card-pink .card-btn:hover { background: #be185d; box-shadow: 0 4px 12px rgba(219, 39, 119, 0.3); }
+
+.card-blue .card-btn { background: #5788B5; }
+.card-blue .card-btn:hover { background: #456b8d; box-shadow: 0 4px 12px rgba(87, 136, 181, 0.3); }
+
+/* DROPDOWN STYLES */
+select.card-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+}
+
+select.card-btn option {
+    background-color: #ffffff;
+    color: #1e293b;
+    font-weight: normal;
+}
+
+/* CORPORATE LIVE CLASS HEADER */
+.live-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.live-header h1 {
+    font-size: 1.5rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.end-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem; /* Adjusted for a better button shape */
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: auto; /* Prevents it from stretching full width */
+}
+
+.end-btn:hover {
+    background-color: #dc2626;
+}
+
+/* CORPORATE TABLE STYLING */
+.live-monitor {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+}
+
+.live-monitor table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0; /* Allows for custom padding */
+    margin-top: 1.5rem;
+}
+
+.live-monitor th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #cbd5e1; /* Stronger line to separate header */
+}
+
+.live-monitor td {
+    padding: 1.25rem 1rem; /* Increased padding for breathing room */
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
+.live-monitor tr:last-child td {
+    border-bottom: none;
+}

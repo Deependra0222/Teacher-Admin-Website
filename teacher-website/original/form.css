@@ -1,0 +1,147 @@
+.text-center {
+    text-align: center;
+}
+
+/* AUTHENTIC CARD LAYOUT */
+
+.login-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 3.5rem 4rem;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.05);
+    border: 1px solid #f1f5f9;
+    border-bottom: 5px solid #7c3aed;
+
+    /* 👇 ADD THESE 3 LINES TO FIX THE ALIGNMENT & SIZE 👇 */
+    max-width: 580px;      /* Stops the input fields from stretching too wide */
+    margin: 5rem auto;     /* Centers the card perfectly in the middle of the workspace */
+    width: 100%;           /* Ensures it stays responsive on mobile screens */
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-link {
+    font-size: 0.85rem;
+    color: #7c3aed;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    font-size: 1.1rem;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 1.1rem 1rem 1.1rem 2.75rem;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    font-size: 1.05rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Beautiful custom focus switch */
+.input-wrapper input:focus {
+    border-color: #a78bfa;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+/* CUSTOM CHECKBOX GRAPHICS */
+.form-options {
+    margin: 1.5rem 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input {
+    cursor: pointer;
+}
+
+/* VIBRANT ACTION BUTTON */
+.login-btn {
+    width: 100%;
+    background: #7c3aed;
+    color: #ffffff;
+    border: none;
+    padding: 1.1rem;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.login-btn:hover {
+    background: #6d28d9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
+}
+
+/* FOOTER CAPTION */
+.login-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+.login-footer a {
+    color: #64748b;
+    text-decoration: underline;
+}
+
+/* Update your existing input selector or add this code */
+input[type="text"], input[type="password"] {
+    transition: all 0.25s ease-in-out;
+}
+
+/* When the teacher clicks inside an input box */
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #7c3aed; /* Your premium purple color */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15); /* Soft purple aura ring */
+    outline: none; /* Removes the default ugly blue browser line */
+}

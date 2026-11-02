@@ -1,0 +1,2 @@
+# The teacher website's protected original backup must remain byte-for-byte.
+teacher-website/original/** -text

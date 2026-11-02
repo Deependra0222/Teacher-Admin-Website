@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher's Portal - Smart Attendance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">✨</span>
+            <h2>Classroom</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active"><span class="icon">🏠</span> Dashboard</a></li>
+            <li><a href="ERP.html"><span class="icon">👥</span> ERP Login</a></li>
+            <li><a href="report.html"><span class="icon">📊</span> Reports</a></li>
+            <li><a href="Setting.html"><span class="icon">⚙️</span> Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-wrapper">
+        <header>
+            <div class="header-left">
+                <button class="toggle-btn" id="menuToggle">☰</button>
+                <div class="welcome-text">
+                    <h1>Good Morning, Teacher! 👋</h1>
+                    <p>Ready to manage your classroom today?</p>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="card-grid">
+
+                <!--ADD THE PROFILE CARD HERE-->
+                <div class="card card-blue">
+                    <div class="card-header">
+                        <span class="card-badge-icon">👤</span>
+                </div>
+                <h3>Teacher Profile</h3>
+                <p>Name :</p>
+                <button class="card-btn">View Profile</button>
+                </div>
+
+                
+                <!-- Card 1: Conduct a Lecture -->
+                <div class="card card-purple">
+                    <div class="card-header">
+                        <span class="card-badge-icon">📚</span>
+                    </div>
+                    <h3>Conduct a Lecture</h3>
+                    <p>Start a new class session and track live attendance using BLE.</p>
+                    <button class="card-btn" onclick="window.location.href='live_class.html'">Start Class</button>
+                </div>
+
+                <!-- Card 2: Batch Management -->
+                <div class="card card-pink">
+                    <div class="card-header">
+                        <span class="card-badge-icon">👥</span>
+                    </div>
+                    <h3>My Batches</h3>
+                    <p>View and manage your assigned batches.</p>
+                    <select id="batchSelect" class="card-btn" style="background: #db2777;">
+                        <option value="">Select Batch</option>
+                        <option value="batchA">Batch A - DBMS</option>
+                        <option value="">Batch B - Data Structures</option>
+                    </select>
+                </div>
+
+                <!-- Card 3: Attendance Filter -->
+                <div class="card card-blue">
+                    <div class="card-header">
+                        <span class="card-badge-icon">📊</span>
+                    </div>
+                    <h3>Attendance Filter</h3>
+                    <p>Filter students by their attendance percentage.</p>
+                    <select id="attendanceFilter" class="card-btn" style="background: #5788B5;">
+                        <option value="100">All Students</option>
+                        <option value="50">Below 50%</option>
+                        <option value="40">Below 40%</option>
+                    </select>
+                </div>
+
+            </div>
+ <!-- Student List Table (Hidden by default) -->
+            <div id="studentListSection" style="margin-top: 2rem; display: none;">
+                <table id="studentTable" style="width: 100%; background: white; border-radius: 12px; overflow: hidden;">
+                    <thead>
+                        <tr style="background: #f1f5f9;">
+                            <th style="padding: 1rem;">Roll No</th>
+                            <th style="padding: 1rem;">Name</th>
+                            <th style="padding: 1rem;">Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="student-row" data-attendance="85">
+                            <td style="padding: 1rem;">101</td>
+                            <td style="padding: 1rem;">Aman Sharma</td>
+                            <td style="padding: 1rem;">85%</td>
+                        </tr>
+                        <tr class="student-row" data-attendance="45">
+                            <td style="padding: 1rem;">102</td>
+                            <td style="padding: 1rem;">Rohit Kumar</td>
+                            <td style="padding: 1rem;">45%</td>
+                        </tr>
+                        <tr class="student-row" data-attendance="38">
+                            <td style="padding: 1rem;">103</td>
+                            <td style="padding: 1rem;">Priya Singh</td>
+                            <td style="padding: 1rem;">38%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

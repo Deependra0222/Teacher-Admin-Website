@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Class - DBMS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header>
+            <h1>Room 302: DBMS in Progress</h1>
+            <button class="card-btn" style="background: #ef4444;" onclick="window.location.href='index.html'">End Class</button>
+        </header>
+        
+        <main>
+            <div class="live-monitor">
+  <h3>Live Class: DBMS (Room 302)</h3>
+  <table id="liveAttendanceTable">
+    <thead>
+      <tr>
+        <th>Roll No</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Entry Time</th>
+        <th>Presence (Mins)</th>
+        <th>Current %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="student-101">
+        <td>101</td>
+        <td>Aman Sharma</td>
+        <td><span class="badge badge-success">Verified</span></td>
+        <td>10:02</td>
+        <td>52 / 60</td>
+        <td>86.7%</td>
+      </tr>
+      <tr id="student-102">
+        <td>102</td>
+        <td>Rohit Kumar</td>
+        <td><span class="badge badge-warning">Outside</span></td>
+        <td>10:05</td>
+        <td>30 / 60</td>
+        <td>50.0%</td>
+      </tr>
+      <tr id="student-103">
+        <td>103</td>
+        <td> Priya Patel</td>
+        <td><span class="badge badge-success">Verified</span></td>
+        <td>10:10</td>
+        <td>45 / 60</td>
+        <td>50.0%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="script-1.js"></script>
+</body>
+</html>

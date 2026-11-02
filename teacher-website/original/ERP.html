@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Login</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="form.css">
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">✨</span>
+            <h2>Classroom</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html"><span class="icon">🏠</span> Dashboard</a></li>
+            <li><a href="ERP.html" class="active"><span class="icon">👥</span> ERP Login</a></li>
+            <li><a href="report.html"><span class="icon">📊</span> Reports</a></li>
+            <li><a href="Setting.html"><span class="icon">⚙️</span> Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-wrapper">
+        
+        <!-- HEADER -->
+        <header>
+            <div class="header-left">
+                <button class="toggle-btn" id="menuToggle">☰</button>
+                <div class="welcome-text">
+                    <h1>Good Morning, Teacher! 👋</h1>
+                    <p>Connect to your central teacher portal and campus network!</p>
+                </div>
+            </div>
+        </header>
+
+         <div class="login-card">
+            <form id="erpLoginForm">
+                
+                <!-- Faculty ID Input -->
+                <div class="form-group">
+                    <label for="facultyId">Faculty ID / Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="facultyId" placeholder="Enter your Faculty ID or Email" required>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        Keep me logged in on this device
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="login-btn">Access Dashboard →</button>
+            </form>
+        </div>
+     
+<script src="script.js"></script>
+</body>
+</html>
