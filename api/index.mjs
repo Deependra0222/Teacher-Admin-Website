@@ -4,7 +4,6 @@
 // without FIREBASE_MODE the backend stays "disabled" (real sign-in off, explicit Demo Mode only).
 import { createApp } from '../backend/dist/app.js';
 import { loadEnvironment } from '../backend/dist/config/environment.js';
-import { createFirebaseAdminRuntime } from '../backend/dist/firebase/admin-runtime.js';
 
 // The deployment's own https origins (preview, branch and production URLs) are always allowed,
 // in addition to ALLOWED_ORIGINS.
@@ -15,7 +14,13 @@ function vercelOrigins(env) {
 }
 
 const config = loadEnvironment(process.env);
-const firebase = createFirebaseAdminRuntime(config.firebase);
+
+// firebase-admin is loaded only when Firebase is enabled. Its jwks-rsa dependency require()s the
+// ESM-only jose package, which Vercel's Node.js 22 runtime refuses (ERR_REQUIRE_ESM), so loading
+// it in "disabled" mode would crash the function. See docs/VERCEL_DEPLOY.md.
+const firebase = config.firebase.mode === 'disabled'
+  ? undefined
+  : (await import('../backend/dist/firebase/admin-runtime.js')).createFirebaseAdminRuntime(config.firebase);
 
 export default createApp({
   ...config,

@@ -34,3 +34,7 @@ backend/.firebase/
 .superpowers/
 .toolchains/
 
+# Vercel CLI: project link and pulled env (.env.local holds a VERCEL_OIDC_TOKEN)
+.vercel
+.env*
+!**/.env.example

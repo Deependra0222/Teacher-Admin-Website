@@ -13,7 +13,8 @@ The Android app is not part of the deployment.
 - `vercel.json`: install (`cd backend && npm ci`), build (`cd backend && npm run build`, TypeScript → `backend/dist`),
   static folder, rewrites, region `bom1` (Mumbai) and basic security headers.
 - `api/index.mjs`: imports `createApp` from `backend/dist` and exports the Express app as the function. It adds the
-  deployment's own `https://` Vercel URLs to the allowed CORS origins.
+  deployment's own `https://` Vercel URLs to the allowed CORS origins, and loads `firebase-admin` only when
+  `FIREBASE_MODE` is not `disabled` (see the Admin SDK note below).
 - `package.json` (root): only pins Node.js `22.x`, matching `backend/package.json` (`>=22 <24`).
 - `.vercelignore`: keeps secrets, the Android/Gradle project, PDFs, docs and tests out of the upload. Everything left
   in `teacher-website/` is public, so `teacher-website/docs`, `tests`, `README.md` and `package.json` are excluded.
@@ -60,13 +61,20 @@ redeploy. None are needed for the current deployment.
 Google metadata server), and service-account key files must never be committed. Do not set `FIREBASE_MODE=adc` on
 Vercel yet: the site would load, but every teacher authorization would fail (fail-closed).
 
+The Admin SDK also does not load on Vercel yet: `firebase-admin` 14 → `jwks-rsa` 4 `require()`s the ESM-only
+`jose` 6, which works on Node.js 22.12+ locally but fails in Vercel's Node.js 22 runtime with `ERR_REQUIRE_ESM`
+(first deployment, 3 Nov 2026). Reproduce locally with
+`node --no-experimental-require-module`. That is why `api/index.mjs` imports it only when Firebase is enabled.
+
 To enable it later:
 
-1. Give the backend a credential that works on Vercel. Recommended: Vercel OIDC federation with a Google Cloud
+1. Make the function load `firebase-admin` on Vercel (for example bundle `api/index.mjs` with esbuild, or try the
+   Node.js 24 runtime) and check `/api/me` on a preview deployment.
+2. Give the backend a credential that works on Vercel. Recommended: Vercel OIDC federation with a Google Cloud
    Workload Identity Pool (keyless, needs a small backend change to build the credential). Avoid key files.
-2. Set `FIREBASE_MODE=adc`, `FIREBASE_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_API_KEY`,
+3. Set `FIREBASE_MODE=adc`, `FIREBASE_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_API_KEY`,
    `FIREBASE_WEB_AUTH_DOMAIN`, `FIREBASE_WEB_PROJECT_ID=smartattend-2a5ce`, `FIREBASE_WEB_APP_ID` and optionally
    `FIREBASE_WEB_STORAGE_BUCKET`, `FIREBASE_WEB_MESSAGING_SENDER_ID`.
-3. Add the Vercel domain in Firebase Console → Authentication → Settings → Authorized domains (and to the Web API
+4. Add the Vercel domain in Firebase Console → Authentication → Settings → Authorized domains (and to the Web API
    key's HTTP-referrer restrictions, if the key is restricted).
-4. Redeploy and follow `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
+5. Redeploy and follow `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
