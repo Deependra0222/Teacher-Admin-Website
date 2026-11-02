@@ -1,11 +1,18 @@
 import cors from "cors";
 import express, { type ErrorRequestHandler, type Express } from "express";
 
+import type { TeacherAuthorizationService } from "./auth/teacher-authorization.js";
+import {
+  createRequireTeacher,
+  writeTeacherAuthorizationError,
+} from "./middleware/require-teacher.js";
+
 export interface AppConfig {
   readonly allowedOrigins: readonly string[];
   readonly staticDirectory: string;
   readonly jsonLimit?: string;
   readonly now?: () => Date;
+  readonly teacherAuthorization?: TeacherAuthorizationService;
 }
 
 class ApiError extends Error {
@@ -60,6 +67,23 @@ export function createApp(config: AppConfig): Express {
       service: "smartattend-teacher-api",
       timestamp: now().toISOString(),
     });
+  });
+
+  const requireTeacher = createRequireTeacher(config.teacherAuthorization);
+
+  app.get("/api/me", requireTeacher, (_request, response) => {
+    response.status(200).json({ teacher: response.locals.teacher });
+  });
+
+  app.get("/api/teacher/assignments", requireTeacher, async (_request, response) => {
+    try {
+      const assignments = await config.teacherAuthorization!.getAssignments(
+        response.locals.teacher.uid,
+      );
+      response.status(200).json({ assignments });
+    } catch (error) {
+      writeTeacherAuthorizationError(response, error);
+    }
   });
 
   app.use("/api", (_request, response) => {
