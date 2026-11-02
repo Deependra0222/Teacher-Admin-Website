@@ -1,8 +1,14 @@
-/* SmartAttend Teacher Portal | Local DEMO ONLY.
-   No Firebase authentication, database writes, or verified BLE data occur here.
-   Production integrations must be implemented server-side with verified roles. */
-(() => {
+/* SmartAttend Teacher Portal.
+   Firebase Authentication grants only a server-authorized teacher shell in Milestone 2.
+   Demo attendance remains explicit, local, and NOT VERIFIED BY BLE. */
+(async () => {
   'use strict';
+  const loadFirebaseConfiguration=()=>new Promise(resolve=>{
+    if(window.__SMARTATTEND_FIREBASE__){resolve();return;}
+    const script=document.createElement('script');script.src='/firebase-config.js';script.onload=()=>resolve();script.onerror=()=>{window.__SMARTATTEND_FIREBASE__={enabled:false};resolve();};document.head.appendChild(script);
+  });
+  await loadFirebaseConfiguration();
+  const {initializeTeacherAuth}=await import('./teacher-auth.js');
   const D = window.SmartAttendDemo;
   const $ = (q, root=document) => root.querySelector(q);
   const $$ = (q, root=document) => [...root.querySelectorAll(q)];
@@ -91,8 +97,72 @@
     display.textContent=state.threshold+'%';slider.addEventListener('input',()=>display.textContent=slider.value+'%');
     $('#saveSettings').addEventListener('click',()=>{state.threshold=Number(slider.value);save();toast('Threshold saved for this browser DEMO only.');});
   }
-  function login(){const form=$('#teacherLogin');form?.addEventListener('submit',e=>{e.preventDefault();$('#loginStatus').textContent='Firebase teacher authentication has not been configured in this starter. No credentials were sent or stored.';$('#loginStatus').classList.remove('hidden');});}
-  bindGlobal();
+  const LOGIN_MESSAGE_KEY='smartattend_teacher_login_message';
+  const showLoginStatus=(message,isSuccess=false)=>{const status=$('#loginStatus');if(!status)return;status.textContent=message;status.classList.remove('hidden');status.dataset.success=String(isSuccess);};
+  function navigateToLogin(message){try{sessionStorage.setItem(LOGIN_MESSAGE_KEY,message);}catch{}location.replace('ERP.html');}
+  function bindSessionExit(auth,session){
+    const link=$('a[href="ERP.html"]');
+    if(!link)return;
+    link.innerHTML=`<span class="nav-icon" aria-hidden="true">↪</span>${session.mode==='demo'?'Exit Demo Mode':'Sign out'}`;
+    link.addEventListener('click',async event=>{event.preventDefault();link.setAttribute('aria-disabled','true');try{await auth.logout();location.replace('ERP.html');}catch{navigateToLogin('The local session was cleared. Firebase sign-out could not be confirmed.');}});
+  }
+  function paintRealMode(session,assignments){
+    const badge=$('.demo-badge');
+    if(badge)badge.textContent='● FIREBASE TEACHER · AUTHORIZED';
+    const intro=$('.intro p');
+    if(intro)intro.textContent=`Authenticated as ${session.teacher.name} · ${session.teacher.department}. Milestone 2 exposes only the authorized teacher profile and assignment scope; attendance data is not connected yet.`;
+    const notice=$('.notice-strip span:last-child');
+    if(notice)notice.innerHTML='<strong>Secure teacher session.</strong> Firebase Authentication and the backend teacher-role check succeeded. Demo records are hidden; official attendance remains unchanged.';
+    $$('main button, main input, main select, main textarea').forEach(control=>{control.disabled=true;});
+    const empty='Authorized teacher access confirmed. Real data for this feature is not implemented in Milestone 2.';
+    const tableTargets=[['#dashboardStudents',6],['#studentsTable',6],['#timetableTable',6],['#presenceTable',6],['#correctionsTable',6],['#reportTable',6]];
+    tableTargets.forEach(([selector,columns])=>{const body=$(selector);if(body)body.innerHTML=`<tr><td colspan="${columns}" class="empty-cell">${empty}</td></tr>`;});
+    ['#studentCount','#averageAttendance','#atRiskCount','#reportTotal','#reportAverage','#reportRisk','#pendingCorrections'].forEach(selector=>{const node=$(selector);if(node)node.textContent='—';});
+    const scheduled=$('#scheduledClasses');if(scheduled)scheduled.textContent=String(assignments.length);
+    const schedule=$('#todaySchedule');if(schedule)schedule.innerHTML=assignments.length?assignments.map(item=>`<div class="schedule-item"><span class="time-chip">Assigned</span><div><strong>${safe(item.subjectId)}</strong><small>${safe(item.batchId)}${item.academicYear?` · ${safe(item.academicYear)}`:''}</small></div><span class="pill muted">Authorized scope</span></div>`).join(''):'<p class="empty-cell">No active teacher assignments were found. Access was not broadened to other students or batches.</p>';
+    const sessionBanner=$('#sessionBanner');if(sessionBanner)sessionBanner.textContent='No real class session is active. Session synchronization is outside Milestone 2.';
+    const sessionStart=$('#sessionStart');if(sessionStart)sessionStart.textContent='—';
+    const noticeList=$('#noticeList');if(noticeList)noticeList.innerHTML=`<p>${empty}</p>`;
+    const noticeCount=$('#noticeCount');if(noticeCount)noticeCount.textContent='0';
+    const reportBars=$('#reportBars');if(reportBars)reportBars.innerHTML=`<p class="empty-cell">${empty}</p>`;
+    const filtered=$('#filteredCount');if(filtered)filtered.textContent='No real student records loaded';
+    const studentResult=$('#studentsResult');if(studentResult)studentResult.textContent='No real student records loaded';
+  }
+  async function login(auth){
+    const form=$('#teacherLogin'),submit=form?.querySelector('button[type="submit"]'),demo=$('#continueDemo'),reset=$('#passwordReset');
+    const storedMessage=(()=>{try{const value=sessionStorage.getItem(LOGIN_MESSAGE_KEY);sessionStorage.removeItem(LOGIN_MESSAGE_KEY);return value;}catch{return null;}})();
+    if(storedMessage)showLoginStatus(storedMessage);
+    if(!auth.firebaseConfigured){
+      if(submit)submit.disabled=true;
+      showLoginStatus(auth.initializationError?.message||'Firebase Web sign-in is not configured on this local server. Demo Mode remains available.');
+    }
+    form?.addEventListener('submit',async event=>{
+      event.preventDefault();if(!form.reportValidity()||!submit)return;
+      submit.disabled=true;showLoginStatus('Signing in with Firebase and checking the teacher role…',true);
+      try{await auth.signIn($('#teacherEmail').value.trim(),$('#teacherPassword').value);location.replace('index.html');}
+      catch(error){showLoginStatus(error instanceof Error?error.message:'Teacher sign-in failed.');submit.disabled=!auth.firebaseConfigured;}
+    });
+    demo?.addEventListener('click',async()=>{demo.disabled=true;try{await auth.enterDemo();location.replace('index.html');}catch{showLoginStatus('Demo Mode could not be started because browser session storage is unavailable.');demo.disabled=false;}});
+    reset?.addEventListener('click',async event=>{event.preventDefault();const email=$('#teacherEmail').value.trim();if(!email){showLoginStatus('Enter your faculty email before requesting a password reset.');return;}reset.setAttribute('aria-disabled','true');try{await auth.sendPasswordReset(email);showLoginStatus('Password reset email requested. Check the inbox for that Firebase account.',true);}catch(error){showLoginStatus(error instanceof Error?error.message:'Password reset failed.');}finally{reset.removeAttribute('aria-disabled');}});
+    if(auth.firebaseConfigured){
+      try{const restored=await auth.restore();if(restored.mode==='real')location.replace('index.html');else if(restored.mode==='demo'&&!storedMessage)showLoginStatus('Demo Mode is active in this browser tab. Continue in Demo Mode or sign in with Firebase to replace it.',true);}
+      catch(error){showLoginStatus(error instanceof Error?error.message:'The saved Firebase session could not be restored.');}
+    }
+  }
+
+  const auth=await initializeTeacherAuth();
   const page=document.body.dataset.page;
-  ({dashboard,students,timetable,live,corrections,notices,reports,settings,login}[page]||(()=>{}))();
+  bindGlobal();
+  if(page==='login'){await login(auth);return;}
+  let session;
+  try{session=await auth.restore();}
+  catch(error){navigateToLogin(error instanceof Error?error.message:'The saved teacher session could not be authorized.');return;}
+  if(session.mode==='none'){navigateToLogin('Sign in with an authorized Firebase teacher account, or explicitly choose Demo Mode.');return;}
+  bindSessionExit(auth,session);
+  if(session.mode==='demo'){
+    ({dashboard,students,timetable,live,corrections,notices,reports,settings}[page]||(()=>{}))();
+    return;
+  }
+  try{paintRealMode(session,await auth.loadAssignments(session));}
+  catch(error){navigateToLogin(error instanceof Error?error.message:'Teacher assignments could not be loaded.');}
 })();
