@@ -1,6 +1,63 @@
 # SmartAttend Verification Report
 
-Updated: 2026-11-02 (Asia/Calcutta)
+Updated: 2026-11-03 (Asia/Calcutta)
+
+## First Real Firebase Teacher Login — Preparation Verification
+
+### Outcome
+
+The existing Firebase project is confirmed as `smartattend-2a5ce`. The Android registration/package and teacher-side live project contract now agree. The earlier `smartattend-e9a35` value was stale documentation/test data, not an active backend connection. Android configuration was inspected but not changed.
+
+The local backend remains intentionally `disabled`. The ignored `.env` now contains the verified project/Web ID, storage bucket, and messaging sender/project number. Web API key, Auth domain, and Web App ID are still blank; Application Default Credentials are absent; `gcloud` is unavailable on `PATH`; and the local Firebase CLI is not signed in. Therefore a production teacher sign-in was correctly **not attempted** and is not claimed. The owner reports the teacher Auth account and complete profile now exist, but the agent did not read that production record.
+
+### Actual commands and results
+
+| Command/check | Result | Evidence |
+|---|---|---|
+| `backend: npm run verify:firebase-project` | PASS / CONFIG NOT LIVE READY | Android project `smartattend-2a5ce`, project number `1065635060805`, package `com.smartattend.app`, backend mode `disabled`, `LIVE PROJECT CONFIG READY: NO`; no key/App ID/token output and no claim that ADC exists. |
+| `backend: npm test` | PASS | 54 assertions across 7 suites; 0 failures. |
+| `backend: npm run typecheck` | PASS | Strict TypeScript check exited 0. |
+| `backend: npm run build` | PASS | TypeScript compilation exited 0. |
+| `teacher-website: npm test` | PASS | 12 assertions across 3 suites; 0 failures. |
+| Website JavaScript syntax | PASS | `node --check` passed for `assets/app.js`, `assets/teacher-auth.js`, and `assets/teacher-auth-core.js`. |
+| Firebase emulator suite | PASS | 12 assertions; 0 failures; used only `demo-smartattend`; Auth/Firestore emulators shut down cleanly. |
+| Android JVM regression | PASS | `build-smartattend.bat testDebugUnitTest --no-daemon`: build successful; 27 tasks up-to-date. |
+| Older teacher dashboard regression | PASS | 3 tests; 0 failures. |
+| Disabled local-server smoke check | PASS | `/api/health`, `/firebase-config.js`, and `/ERP.html` returned 200; config was `enabled:false`/`no-store`; `/api/me` returned fail-closed 503. |
+
+### Requested authentication matrix
+
+| Case | Verification |
+|---|---|
+| Valid teacher authentication | Unit/API plus real Auth/Firestore emulator success with complete UID profile. |
+| Student attempting teacher login | Unit/API and emulator denial. |
+| Missing teacher profile | Unit/API and emulator denial at direct `users/{uid}` lookup. |
+| Incorrect teacher role | Unit/API covers `student`, `admin`, and `Teacher`; emulator covers wrong/capitalized role. |
+| Incomplete teacher profile | Unit/API covers missing name, blank email, and non-string department; same mapper guards every required field/type. |
+| Invalid Firebase ID token | Unit/API and emulator return safe 401. |
+| Expired or revoked token | Unit/API distinguishes `TOKEN_EXPIRED` and `TOKEN_REVOKED`; verification always requests revocation checking. |
+| Missing Firebase configuration | Runtime/endpoint tests keep disabled mode fail-closed with safe 503. |
+| Firebase connection/service failure | Token-verifier and profile-store outage tests return safe 503; website backend connection failure exposes no private detail. |
+| Successful logout | Website session test confirms local Demo marker removal and Firebase sign-out; failure test still clears the local marker. |
+
+### Configuration and authorization findings
+
+- Live project ID: `smartattend-2a5ce`.
+- Android package/application ID: `com.smartattend.app`.
+- Web SDK: modular Firebase Web SDK, configured only from the backend's no-cache public config endpoint.
+- Admin SDK: `applicationDefault()` with explicit project ID `smartattend-2a5ce` in ADC mode.
+- Project-consistency audit: live mode requires matching Android/Admin/Web project ID, Web App ID project number `1065635060805`, and (when supplied) messaging sender ID.
+- Token policy: Bearer token verified by Firebase Admin with revocation checking.
+- Profile path: `users/{decoded Firebase UID}`; no email query and no frontend-supplied role/UID trust.
+- Required profile fields: exact lowercase string `role: "teacher"`; nonblank strings `name`, `email`, and `department`.
+- Optional profile field: boolean `active`; omitted or `true` permits evaluation, `false` denies access.
+- Complete beginner steps and diagnostics: `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
+
+### Intentionally not run/changed
+
+- No production Firebase Authentication request or Firestore operation.
+- No teacher account/profile creation, credential handling, production read, or production data write by the agent.
+- No Firestore rule, Android Firebase config, website design, original backup, attendance record, deployment, billing, Milestone 3, or ESP32/BLE change.
 
 ## Teacher Website / Firebase Authentication Milestone 2
 
@@ -8,7 +65,7 @@ Updated: 2026-11-02 (Asia/Calcutta)
 
 Milestone 2 is implemented and verified against Firebase Authentication and Cloud Firestore emulators. The website now performs Firebase Email/Password sign-in and the Express backend independently verifies the ID token, exact teacher role/profile, and UID-scoped active assignments. No production deployment, production rule change, official attendance write, Android change, or ESP32/BLE work occurred.
 
-Live login to the existing `smartattend-e9a35` project was **not run** because this workspace does not contain the Firebase Web App configuration, local Application Default Credentials, or an administrator-provisioned teacher test account/profile. This is the remaining external configuration boundary, not an emulator/build failure.
+Live login to the existing `smartattend-2a5ce` project was **not run** because the local Firebase Web App configuration is incomplete and Application Default Credentials are absent. This is the remaining external configuration boundary, not an emulator/build failure. The earlier `smartattend-e9a35` name was a stale teacher-side example and was never an active backend configuration.
 
 ### Actual automated results
 

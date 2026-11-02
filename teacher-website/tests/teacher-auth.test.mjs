@@ -42,6 +42,7 @@ function fakeGateway(overrides = {}) {
       },
       async signOut() {
         calls.push(["signOut"]);
+        if (overrides.signOutError) throw overrides.signOutError;
       },
       async sendPasswordReset(email) {
         calls.push(["sendPasswordReset", email]);
@@ -169,6 +170,23 @@ describe("teacher session separation", () => {
     assert.deepEqual(firebase.calls, [["signOut"]]);
   });
 
+  test("logout clears the local Demo marker even if Firebase is unreachable", async () => {
+    const storage = new MemoryStorage();
+    storage.setItem("smartattend_teacher_demo_session", "explicit");
+    const firebase = fakeGateway({
+      signOutError: new Error("simulated Firebase connection failure"),
+    });
+    const controller = createTeacherSessionController({
+      storage,
+      firebaseGateway: firebase.gateway,
+      backendClient: { authorize: async () => ({}) },
+    });
+
+    await assert.rejects(controller.logout(), /simulated Firebase connection failure/);
+    assert.equal(storage.getItem("smartattend_teacher_demo_session"), null);
+    assert.deepEqual(firebase.calls, [["signOut"]]);
+  });
+
   test("delegates password reset to Firebase without changing the session mode", async () => {
     const storage = new MemoryStorage();
     const firebase = fakeGateway();
@@ -235,6 +253,21 @@ describe("protected backend client", () => {
         error instanceof PortalAuthError &&
         error.code === "TEACHER_PROFILE_MISSING" &&
         /profile exists/.test(error.message),
+    );
+  });
+
+  test("reports a backend connection failure without exposing internals", async () => {
+    const client = createBackendClient(async () => {
+      throw new Error("private network detail");
+    });
+
+    await assert.rejects(
+      client.authorize({ getIdToken: async () => "token" }),
+      (error) =>
+        error instanceof PortalAuthError &&
+        error.code === "BACKEND_UNREACHABLE" &&
+        /backend is running/i.test(error.message) &&
+        !/private network detail/i.test(error.message),
     );
   });
 });

@@ -12,7 +12,7 @@ This milestone establishes identity and read-only authorization only. It does no
 - `teacher-website/original/` is a protected byte-for-byte backup and must not change.
 - The improved HTML/CSS layout must remain visually unchanged.
 - The Android application and `firestore.rules` must remain unchanged.
-- The existing Firebase project is `smartattend-e9a35`; no Web App configuration is present in the workspace yet.
+- The original Milestone 2 assumption named `smartattend-e9a35`. The later cross-client audit corrected the existing project to `smartattend-2a5ce`, as verified from the ignored Android `google-services.json`; no Web App configuration is committed to the workspace.
 - Firebase Web configuration is public application metadata, but it will be supplied at runtime from ignored backend environment values rather than committed into the website.
 - Firebase Admin credentials are private. The implementation supports Application Default Credentials and the Firebase Emulator Suite; credentials are never embedded in browser or source files.
 - The present Firestore rules are not used as teacher API authorization. Firebase Admin bypasses rules, so every server operation must validate UID, role, and assignment scope itself.

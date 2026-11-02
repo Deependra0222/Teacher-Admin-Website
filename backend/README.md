@@ -98,14 +98,17 @@ Open `http://localhost:3000/ERP.html`. The page states that Firebase is not conf
 
 ## Connect the existing live SmartAttend project locally
 
-1. In Firebase Console, open the existing SmartAttend project (`smartattend-e9a35`).
+1. In Firebase Console, open the existing SmartAttend project (`smartattend-2a5ce`). The Android registration in this workspace confirms that exact project ID.
 2. In **Project settings → General → Your apps**, register or select a Web App. Do not enable Hosting.
 3. Copy `backend/.env.example` to the ignored `backend/.env`.
-4. Set `FIREBASE_MODE=adc`, `FIREBASE_PROJECT_ID=smartattend-e9a35`, and the public Web App values from the Console (`apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`).
-5. Configure Application Default Credentials for an authorized Google account, normally with `gcloud auth application-default login`. This credential stays in the operating-system Google Cloud credential store; do not copy a service-account JSON file into this project.
-6. Run `npm run dev` and open `http://localhost:3000/ERP.html`.
+4. The verified project ID, Web project ID, storage bucket, and messaging sender ID are already documented. Copy the existing Web App's `apiKey`, `authDomain`, and `appId` exactly, then set `FIREBASE_MODE=adc`. Never substitute the Android App ID; the Web App ID contains `:web:`.
+5. Configure Application Default Credentials. Prefer service-account impersonation when IAM permits; otherwise keep a deliberately generated local service-account key outside this workspace and set `GOOGLE_APPLICATION_CREDENTIALS` only for the backend process. Firebase CLI login is not Admin ADC, and plain gcloud end-user ADC may require a custom Desktop OAuth client for Firebase Authentication. See `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
+6. Run `npm run verify:firebase-project`. It must report `LIVE PROJECT CONFIG READY: YES` before the first live test. This checks project/Web configuration only; ADC must also be configured. The command prints only project/mode status, never Web keys, App IDs, tokens, or Admin credentials.
+7. Run `npm run dev` and open `http://localhost:3000/ERP.html`.
 
 The Admin identity needs permission to verify Firebase users and read the two authorization collections. If ADC is absent or lacks access, the backend fails closed with a safe authorization-service error.
+
+On the currently inspected Windows machine, Application Default Credentials are absent and `gcloud` is not available on `PATH`. Leave `FIREBASE_MODE=disabled` until a supported ADC source is deliberately provided. Do not put a service-account key in `backend/`, the website, or Git.
 
 No Firebase project, rule, record, or deployment is changed merely by starting the server. The browser performs Authentication sign-in; the backend performs read-only profile and assignment authorization.
 
@@ -132,6 +135,7 @@ cd "D:\Smart Attend\backend"
 npm test
 npm run typecheck
 npm run build
+npm run verify:firebase-project
 ```
 
 Firebase Emulator Suite verification uses the Android Studio bundled JDK on this machine:
@@ -151,11 +155,14 @@ backend/
   src/app.ts                              API/static routes and safe errors
   src/auth/teacher-authorization.ts       token/profile/assignment policy
   src/config/environment.ts               validated runtime and Web config
+  src/config/firebase-project-audit.ts    Android/Admin/Web ID consistency policy
   src/firebase/admin-runtime.ts            Admin SDK adapters and runtime
   src/firebase/config.ts                   Firebase configuration types
   src/middleware/require-teacher.ts         Bearer-token middleware
+  src/tools/verify-firebase-project.ts      redacted local readiness command
   src/index.ts                             startup and shutdown
   tests/app.test.ts                        HTTP foundation tests
+  tests/firebase-project-audit.test.ts      cross-client consistency tests
   tests/teacher-authorization.test.ts      authorization unit/API tests
   tests/firebase-runtime.test.ts            runtime/config/adapter tests
   tests/firebase-emulator.integration.test.ts   real emulator integration tests

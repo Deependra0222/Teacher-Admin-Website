@@ -52,7 +52,7 @@ describe("Firebase runtime configuration", () => {
       () =>
         loadEnvironment({
           FIREBASE_MODE: "adc",
-          FIREBASE_PROJECT_ID: "smartattend-e9a35",
+          FIREBASE_PROJECT_ID: "smartattend-2a5ce",
           FIREBASE_WEB_API_KEY: "public-api-key",
         }),
       /Firebase Web configuration is incomplete/,
@@ -62,9 +62,9 @@ describe("Firebase runtime configuration", () => {
       () =>
         loadEnvironment({
           FIREBASE_MODE: "adc",
-          FIREBASE_PROJECT_ID: "smartattend-e9a35",
+          FIREBASE_PROJECT_ID: "smartattend-2a5ce",
           FIREBASE_WEB_API_KEY: "public-api-key",
-          FIREBASE_WEB_AUTH_DOMAIN: "smartattend-e9a35.firebaseapp.com",
+          FIREBASE_WEB_AUTH_DOMAIN: "smartattend-2a5ce.firebaseapp.com",
           FIREBASE_WEB_PROJECT_ID: "another-project",
           FIREBASE_WEB_APP_ID: "1:web:example",
         }),
@@ -75,24 +75,24 @@ describe("Firebase runtime configuration", () => {
   test("accepts the public Web configuration separately from Admin credentials", () => {
     const config = loadEnvironment({
       FIREBASE_MODE: "adc",
-      FIREBASE_PROJECT_ID: "smartattend-e9a35",
+      FIREBASE_PROJECT_ID: "smartattend-2a5ce",
       FIREBASE_WEB_API_KEY: "public-api-key",
-      FIREBASE_WEB_AUTH_DOMAIN: "smartattend-e9a35.firebaseapp.com",
-      FIREBASE_WEB_PROJECT_ID: "smartattend-e9a35",
-      FIREBASE_WEB_STORAGE_BUCKET: "smartattend-e9a35.firebasestorage.app",
+      FIREBASE_WEB_AUTH_DOMAIN: "smartattend-2a5ce.firebaseapp.com",
+      FIREBASE_WEB_PROJECT_ID: "smartattend-2a5ce",
+      FIREBASE_WEB_STORAGE_BUCKET: "smartattend-2a5ce.firebasestorage.app",
       FIREBASE_WEB_MESSAGING_SENDER_ID: "123456789",
       FIREBASE_WEB_APP_ID: "1:123456789:web:abcdef",
     });
 
     assert.deepEqual(config.firebase, {
       mode: "adc",
-      projectId: "smartattend-e9a35",
+      projectId: "smartattend-2a5ce",
     });
     assert.deepEqual(config.firebaseWebConfig, {
       apiKey: "public-api-key",
-      authDomain: "smartattend-e9a35.firebaseapp.com",
-      projectId: "smartattend-e9a35",
-      storageBucket: "smartattend-e9a35.firebasestorage.app",
+      authDomain: "smartattend-2a5ce.firebaseapp.com",
+      projectId: "smartattend-2a5ce",
+      storageBucket: "smartattend-2a5ce.firebasestorage.app",
       messagingSenderId: "123456789",
       appId: "1:123456789:web:abcdef",
     });
@@ -118,8 +118,8 @@ describe("public Firebase browser configuration", () => {
         staticDirectory,
         firebaseWebConfig: {
           apiKey: "public-api-key",
-          authDomain: "smartattend-e9a35.firebaseapp.com",
-          projectId: "smartattend-e9a35",
+          authDomain: "smartattend-2a5ce.firebaseapp.com",
+          projectId: "smartattend-2a5ce",
           appId: "1:web:<unsafe>",
         },
       }),

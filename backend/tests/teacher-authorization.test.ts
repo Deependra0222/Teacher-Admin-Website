@@ -157,6 +157,23 @@ describe("teacher authorization endpoints", () => {
     });
   });
 
+  test("returns a safe 503 when Firebase token verification is unavailable", async () => {
+    const tokenBehaviors = new Map<string, TokenBehavior>([
+      [teacherToken, { errorCode: "auth/internal-error" }],
+    ]);
+    const response = await request(createConfiguredTestApp({ tokenBehaviors }))
+      .get("/api/me")
+      .set(bearer());
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(response.body, {
+      error: {
+        code: "AUTHORIZATION_SERVICE_UNAVAILABLE",
+        message: "Teacher authorization is temporarily unavailable.",
+      },
+    });
+  });
+
   test("rejects an authenticated account with no users UID profile", async () => {
     const response = await request(createConfiguredTestApp({ profile: null }))
       .get("/api/me")

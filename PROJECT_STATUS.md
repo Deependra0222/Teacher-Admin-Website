@@ -1,14 +1,35 @@
 # SmartAttend Project Status
 
-Updated: 2026-11-02 (Asia/Calcutta)
+Updated: 2026-11-03 (Asia/Calcutta)
 
 ## Current outcome
 
-The approved **SmartAttend Student Android App milestone remains implemented and buildable**, the **Firebase student authentication milestone remains implemented**, and **Teacher Website / Node.js Backend Milestone 2 is complete and ready for review**. The generated Android debug APK remains:
+The approved **SmartAttend Student Android App milestone remains implemented and buildable**, the **Firebase student authentication milestone remains implemented**, **Teacher Website / Node.js Backend Milestone 2 remains complete**, and the **first real teacher-login test is prepared up to the owner-supplied Firebase Web values and local ADC boundary**. The generated Android debug APK remains:
 
 `D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
 
 All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The teacher portal now performs real Firebase Authentication and server-side teacher authorization when configured, while its attendance/business screens remain unconnected. No Firestore write, official attendance change, Android synchronization, BLE scan, ESP32 signal, deployment, or teacher finalization is claimed.
+
+## Real Firebase teacher-login test preparation completed
+
+- On 2026-11-03, the owner reported that the first Email/Password teacher account and complete `users/{teacherUID}` profile now exist in `smartattend-2a5ce`. This production record was not read by the agent because live Web/Admin credentials are not configured yet.
+
+- Resolved the project-ID mismatch. The ignored Android `app/google-services.json` identifies `smartattend-2a5ce`, project number `1065635060805`, package `com.smartattend.app`, and the matching Android App ID. The Gradle `applicationId` is also `com.smartattend.app`.
+- Confirmed `smartattend-e9a35` was only a stale teacher-side example/test value. It was not active backend runtime configuration. Teacher examples and runtime fixtures now use the verified `smartattend-2a5ce` ID; historical design notes explicitly record the correction.
+- Left the Android Firebase file and all Android source/Gradle files unchanged.
+- Prepared the ignored local `backend/.env` with verified public project values while keeping `FIREBASE_MODE=disabled`: project/Web project ID `smartattend-2a5ce`, storage bucket `smartattend-2a5ce.firebasestorage.app`, and messaging sender/project number `1065635060805`. Only Web API key, Auth domain, and Web App ID remain blank.
+- Added `npm run verify:firebase-project`. It reads Android registration metadata, checks live ADC Admin/Web project IDs, Web App ID project number, and messaging sender ID, treats `demo-smartattend` emulator mode as intentionally isolated, and prints only redacted project/mode readiness.
+- Current audit result: Android project `smartattend-2a5ce`, package `com.smartattend.app`, backend mode `disabled`, `LIVE PROJECT CONFIG READY: NO`. This is the expected safe result until `.env` is completed and changed to `adc`; the command deliberately does not claim ADC or a real login is ready.
+- Reconfirmed the existing server flow: modular Firebase Web Email/Password sign-in; browser ID token in the Bearer header; Firebase Admin `verifyIdToken(token, true)`; decoded UID; direct Firestore read at `users/{uid}`; exact teacher role/profile authorization; session-only browser persistence; separate explicit Demo Mode; Firebase logout.
+- Reconfirmed the profile contract against the implementation: required nonblank strings `role` (exactly lowercase `teacher`), `name`, `email`, and `department`; optional `active` must be boolean and `false` denies access. Profiles are retrieved by verified UID, never an email query.
+- Added/confirmed tests for all ten requested cases: valid teacher, student denial, missing profile, wrong role, incomplete profile, invalid token, expired/revoked token, missing configuration, Firebase/service connection failure, and logout.
+- Fresh 2026-11-03 automated results: backend **54/54**, website **12/12**, Firebase Auth/Firestore emulator **12/12**, Android JVM regression **BUILD SUCCESSFUL**, TypeScript typecheck/build **PASS**, and website JavaScript syntax **PASS**.
+- The first emulator invocation could not spawn `java -version` because Java was absent from that process's `PATH`; rerunning with Android Studio's bundled JDK prepended passed all 12 emulator assertions. This was a local shell-path issue, not an application failure.
+- The currently running local server remains safely disabled: health/login/config returned HTTP 200, public config reported `enabled:false` with `no-store`, and protected `/api/me` failed closed with HTTP 503.
+- Application Default Credentials are not present on this Windows machine, `gcloud` is not installed/on `PATH`, and the local Firebase CLI is not signed in. The Firebase Console browser check reached Google sign-in. The backend's `applicationDefault()` configuration is correct for supported ADC, but live authorization cannot be tested until the owner supplies ADC with access to `smartattend-2a5ce`.
+- Corrected the ADC guidance: plain gcloud end-user ADC may require a custom Desktop OAuth client for Firebase Authentication. The checklist now prefers service-account impersonation when IAM permits, with a carefully protected out-of-repository service-account key as the simpler fallback.
+- Added the beginner walkthrough at `docs/FIREBASE_TEACHER_LIVE_LOGIN_CHECKLIST.md`.
+- Live Firebase teacher login was **not run**. No credentials were supplied, no teacher account/profile was created by the agent, no production read/write was attempted, and no rule/deployment/billing change occurred.
 
 ## Teacher Website / backend Milestone 2 completed
 
@@ -29,7 +50,7 @@ All sample attendance, device, correction, notice, timetable, and BLE content re
 - Compiled-server smoke verification: health, runtime Web config, and login page returned 200; disabled config was non-cacheable; `/api/me` failed closed with 503 when Firebase was intentionally disabled.
 - Actual host tooling for final verification: Node.js 22.23.4, npm 10.9.9, Firebase CLI 15.34.2, and Android Studio bundled Java via `JAVA_HOME`.
 - Dependency audit: 16 moderate, 0 high, and 0 critical advisories remain in total. Six moderate transitive findings remain when development packages are omitted under Firebase Admin's Google Cloud dependencies; the additional findings come from Firebase CLI tooling. The suggested aggregate CLI downgrade is not appropriate; no forced audit change was applied.
-- Live existing-project teacher login was **not run** because this workspace still has no Firebase Web App configuration, Application Default Credentials, or owner-provisioned teacher test account/profile. Emulator proof is complete; live proof remains an external configuration step.
+- Live existing-project teacher login was **not run** because the local Firebase Web App configuration is incomplete and Application Default Credentials are absent. The owner reports the teacher account/profile is complete; emulator proof is complete, while live proof remains an external configuration step.
 
 ## Firebase authentication milestone completed
 
@@ -137,4 +158,4 @@ Current environment blocker: **none for building, linting, the offline app, Fire
 
 ## Next major goal
 
-Stop for user review of Teacher Website / backend Milestone 2. The next manual step is to provide the existing Firebase Web App configuration through ignored `backend/.env`, configure local Application Default Credentials, and provision the first trusted teacher Auth/profile record. After live login is owner-verified, the next development milestone may connect teacher business data through assignment-scoped endpoints. Android/teacher synchronization and ESP32/BLE hardware work remain later milestones.
+Stop for user review of the real-login preparation. The next manual step is to copy the three remaining existing Firebase Web App values into ignored `backend/.env` and configure local Application Default Credentials; the owner reports the trusted teacher Auth/profile record is ready. After live login is owner-verified, the next development milestone may connect teacher business data through assignment-scoped endpoints. Android/teacher synchronization and ESP32/BLE hardware work remain later milestones.
