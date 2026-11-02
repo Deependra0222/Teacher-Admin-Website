@@ -1,6 +1,6 @@
 # SmartAttend
 
-SmartAttend currently delivers a complete offline-capable **Student Android App milestone** built with Kotlin, Jetpack Compose, Material 3, Navigation Compose, Room, and Preferences DataStore. It now has a separate Firebase Email/Password sign-in path with UID-bound, read-only Firestore student-profile authorization. A teacher website is the next major product milestone after review; the existing `teacher-dashboard/` prototype has been preserved and was not expanded in this milestone.
+SmartAttend currently delivers a complete offline-capable **Student Android App milestone** built with Kotlin, Jetpack Compose, Material 3, Navigation Compose, Room, and Preferences DataStore. It has a separate Firebase Email/Password sign-in path with UID-bound, read-only Firestore student-profile authorization. The improved multi-page Teacher Website is now preserved in `teacher-website/`, and Milestone 1 of its Node.js/Express backend is available in `backend/`. Real teacher Firebase authentication and Firestore data are intentionally deferred to Milestone 2.
 
 This APK uses realistic demo data and a simulated BLE decision engine. Firebase login calls `signInWithEmailAndPassword` and authorizes only `users/{authenticatedUid}` profiles whose role is exactly `student`. The app does **not** write Firestore, synchronize attendance with a teacher, scan Bluetooth devices, connect to ESP32 hardware, or finalize official attendance. A Firebase identity never makes the still-local attendance records official; the UI continues to label them `DEMO`, `SIMULATED`, and `NOT VERIFIED BY BLE`.
 
@@ -54,6 +54,20 @@ To install it with Android Studio, drag the APK onto a running emulator, or use 
 adb install -r "D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk"
 ```
 
+## Preview the Teacher Website and backend
+
+The uploaded HTML/CSS/JavaScript design is unchanged and still uses clearly labeled local demo data. To install, test, build, and preview it through Express:
+
+```powershell
+cd "D:\Smart Attend\backend"
+npm ci
+npm test
+npm run build
+npm start
+```
+
+Open `http://localhost:3000/` for the website, `http://localhost:3000/ERP.html` for the teacher sign-in preview, and `http://localhost:3000/api/health` for the backend health check. See `backend/README.md` for beginner instructions and Firebase Milestone 2 boundaries.
+
 ## Project structure
 
 - `app/src/main/java/com/smartattend/app/core` — student/domain models.
@@ -62,14 +76,16 @@ adb install -r "D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk"
 - `app/src/main/java/com/smartattend/app/data/firebase` — Firebase Auth, read-only student-profile authorization, and safe error mapping.
 - `app/src/main/java/com/smartattend/app/ui` — Compose navigation, primary screens, and nested workflows.
 - `app/schemas` — checked-in Room database schema snapshot.
-- `teacher-dashboard/` — preserved local teacher prototype for review in the next milestone.
-- `docs/` and `firestore.rules` — design and future backend readiness documents; not a deployed backend.
+- `teacher-dashboard/` — preserved older local teacher prototype; unchanged by the improved-site import.
+- `teacher-website/` — uploaded improved multi-page HTML/CSS/JavaScript demo, including its protected `original/` backup.
+- `backend/` — tested Node.js/Express/TypeScript local foundation; Firebase Admin is installed but not initialized.
+- `docs/` and `firestore.rules` — design and future backend readiness documents; not a deployed production backend.
 
 ## Future milestones
 
-1. Review this Student Android App.
-2. Build the Teacher Admin Website.
-3. Verify the real Firebase student account/profile flow with owner-entered credentials, then implement secured Firestore synchronization and server-side authorization/finalization.
+1. Review the Teacher Website and local Express foundation.
+2. Register a Firebase Web app in the existing SmartAttend project, then implement and test teacher authentication, role checks, and teacher assignments.
+3. Connect authorized teacher/student data through secured Firestore and trusted server-side operations.
 4. Add Android BLE scanning and ESP32 firmware, calibrate with physical devices, and run real classroom tests.
 
 Do not add `google-services.json`, service-account keys, signing keys, or other credentials to source control.

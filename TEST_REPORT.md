@@ -1,6 +1,30 @@
-# SmartAttend Student Android App and Firebase Authentication Test Report
+# SmartAttend Verification Report
 
-Date: 2026-10-11 (Asia/Calcutta)
+Updated: 2026-11-02 (Asia/Calcutta)
+
+## Teacher Website / Node.js Backend Milestone 1
+
+| Check | Result | Evidence |
+|---|---|---|
+| Uploaded website preservation | PASS | 25/25 working-tree SHA-256 hashes and 25/25 committed Git-blob hashes match the extracted ZIP. |
+| Protected `original/` backup | PASS | 9/9 files remain byte-for-byte; Git text conversion is disabled only for this backup path. |
+| Website JavaScript syntax | PASS | `node --check` passed for `assets/app.js`, `assets/demo-data.js`, `original/script.js`, and `original/script-1.js`. |
+| Website local links | PASS | Static scan found 0 missing local HTML/CSS/JS link targets. |
+| Clean dependency installation | PASS WITH ADVISORIES | `npm ci` installed 319 packages; audit reports 6 moderate, 0 high, 0 critical transitive advisories under Firebase Admin dependencies. |
+| Backend automated tests | PASS | `npm test`: 10 tests across 2 suites, 0 failures. |
+| TypeScript type check | PASS | `npm run typecheck` exited 0. |
+| Production compile | PASS | `npm run build` exited 0 and produced `backend/dist/index.js`. |
+| Compiled server health | PASS | `GET http://localhost:3000/api/health` returned HTTP 200 and `service: smartattend-teacher-api`. |
+| Compiled dashboard serving | PASS | `/` returned HTTP 200 with the uploaded Teacher Dashboard title. |
+| Compiled login-page serving | PASS | `/ERP.html` returned HTTP 200 with the existing `teacherLogin` form. |
+| Older teacher prototype regression | PASS | `node --test dashboard-model.test.js`: 3 tests, 0 failures. |
+| Android JVM regression | PASS | `build-smartattend.bat testDebugUnitTest --no-daemon`: build successful using bundled JDK 17. |
+
+Backend tests cover health response, no-Origin requests, allowed and denied browser origins, API JSON 404 behavior, malformed JSON, oversized JSON, explicit static-directory serving, environment defaults/overrides, and invalid port rejection.
+
+Actual host runtime was Node.js 23.11.0 with npm 11.4.2. The project targets Node.js 22, but Node.js 22 runtime execution was not performed. Firebase CLI, Firebase Emulator Suite, Firebase Web Auth, Firebase Admin initialization, Firestore, real teacher credentials, interactive browser testing, and deployment were not run. All teacher attendance content remains local DEMO / NOT LIVE data.
+
+## Student Android and Firebase authentication verification (2026-10-11)
 
 ## Automated verification
 

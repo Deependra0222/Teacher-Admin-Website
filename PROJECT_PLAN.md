@@ -5,7 +5,7 @@
 SmartAttend has two clients that will eventually share one Firebase backend:
 
 1. **Student Android application** — native Kotlin/Jetpack Compose app. This is the completed current milestone.
-2. **Teacher Admin Website** — the next major milestone, after student-app review. The existing `teacher-dashboard/` demo is preserved for possible reuse.
+2. **Teacher Admin Website** — the improved static portal and its local Express foundation are now preserved and verified; Firebase teacher authentication is next. The older `teacher-dashboard/` demo remains untouched.
 3. **Shared Firebase backend** — Authentication, secured Firestore records, Cloud Functions, audit logs, and synchronization for both clients.
 4. **ESP32/BLE integration** — Android scanning, measured RSSI calibration, real-device duration/loss tests, and secure server-side attendance finalization.
 
@@ -47,11 +47,14 @@ Status: **Implemented and automated/emulator failure-path verified; real owner a
 
 ## Milestone 3 — Teacher Admin Website
 
-Status: **Next, pending user review of the Student Android App.**
+Status: **Milestone 1 foundation completed; Milestone 2 Firebase teacher authentication pending review/configuration.**
 
-- Review the existing `teacher-dashboard/` prototype before deciding what can be reused.
-- Build the professional teacher workflow for timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings.
-- Keep the site in demo/local mode until the shared Firebase contract is implemented.
+- Preserved the existing `teacher-dashboard/` prototype unchanged.
+- Imported the 25-file improved website into `teacher-website/` without changing its HTML, CSS, JavaScript, navigation, demo labels, or protected `original/` backup.
+- Added a Node.js 22-compatible, TypeScript/Express 5 foundation in `backend/` with static serving, health endpoint, strict CORS allowlist, bounded JSON parsing, safe API errors, tests, type checking, and production compilation.
+- Kept Firebase Admin installed but uninitialized; no Web SDK, Auth request, Firestore read/write, rules deployment, or production data exists in this milestone.
+- Next: register a Web app in the existing SmartAttend Firebase project, then implement teacher Email/Password login, ID-token verification, exact teacher-role checks, and assignment-scoped read APIs with negative authorization tests.
+- Later: connect timetable/session control, live evidence monitoring, corrections, announcements, analytics, reports, profile, and settings only through the secured shared backend.
 
 ## Firebase Android SDK foundation — Completed
 

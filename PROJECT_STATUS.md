@@ -1,14 +1,31 @@
 # SmartAttend Project Status
 
-Updated: 2026-10-11 (Asia/Calcutta)
+Updated: 2026-11-02 (Asia/Calcutta)
 
 ## Current outcome
 
-The approved **SmartAttend Student Android App milestone remains implemented and buildable**, and the **Firebase student authentication milestone is implemented and ready for review**. The generated debug APK is:
+The approved **SmartAttend Student Android App milestone remains implemented and buildable**, the **Firebase student authentication milestone remains implemented**, and **Teacher Website / Node.js Backend Milestone 1 is complete and ready for review**. The generated Android debug APK remains:
 
 `D:\Smart Attend\app\build\outputs\apk\debug\app-debug.apk`
 
-All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, or `NOT VERIFIED BY BLE`. Firebase client initialization and a controlled real Auth failure request are verified. A successful registered-student login is **not yet verified** because the user's password was not supplied or recorded and the required `users/{uid}` profile has not been observed. No Firestore write, synchronization, Android BLE scan, ESP32 signal, or teacher finalization is claimed.
+All sample attendance, device, correction, notice, timetable, and BLE content remains visibly labeled `DEMO`, `SIMULATED`, `NOT LIVE`, or `NOT VERIFIED BY BLE`. The improved teacher pages are still browser-local demo screens. The new Express server does not initialize Firebase or authorize teachers. No Firestore write, synchronization, Android BLE scan, ESP32 signal, or teacher finalization is claimed.
+
+## Teacher Website / backend Milestone 1 completed
+
+- Inspected the uploaded ZIP. Its actual contents match the supplied description: 9 improved HTML pages, 3 shared asset files, README, 3 documentation files, and the 9-file `original/` backup (25 files total).
+- Preserved the older `teacher-dashboard/` and the Android project unchanged.
+- Imported the uploaded package as `teacher-website/` and verified 25/25 working-tree SHA-256 hashes plus 25/25 committed Git-blob hashes against the ZIP extraction.
+- Added a path-scoped `.gitattributes` rule so Git cannot normalize the protected backup's CRLF bytes.
+- Added `backend/` using TypeScript 7.0.2, Express 5.3.0, Firebase Admin 14.5.0, CORS 2.8.6, dotenv 18.0.9, Supertest 7.3.1, tsx 4.23.15, and the Node test runner.
+- Added `GET /api/health`, an explicit CORS allowlist, a 100 KB default JSON limit, safe JSON/size/internal errors, JSON 404s for unknown APIs, and static serving of `teacher-website/`.
+- Firebase Admin is installed for the next milestone but is not imported or initialized. No Firebase Web config, ID-token check, teacher role, assignment query, or production record access was implemented.
+- Backend verification: `npm ci` completed; `npm test` passed 10/10; `npm run typecheck` passed; `npm run build` passed and produced `backend/dist/index.js`.
+- Live compiled-server verification: `http://localhost:3000/api/health`, `/`, and `/ERP.html` each returned HTTP 200; the dashboard title and teacher form were present. The temporary server was then stopped.
+- Website verification: 4/4 JavaScript syntax checks passed and 0 missing local HTML/CSS/JS links were found.
+- Regression verification: existing `teacher-dashboard` tests passed 3/3, and `build-smartattend.bat testDebugUnitTest --no-daemon` passed using the bundled JDK 17.
+- Actual host tooling: Node.js 23.11.0 and npm 11.4.2. The package targets Node.js 22-compatible behavior, but Node.js 22 was not installed/run during this verification. Firebase CLI is not installed globally.
+- Dependency audit: 6 moderate, 0 high, and 0 critical advisories remain transitively under Firebase Admin's Google Cloud dependencies. Plain `npm audit fix` could not resolve them; no unsafe forced major override was applied.
+- Not run: real teacher login, Firebase Admin initialization, Firebase Emulator Suite, Firestore reads/writes, production rules, interactive browser automation, deployment, or production attendance workflows.
 
 ## Firebase authentication milestone completed
 
@@ -107,7 +124,7 @@ Current environment blocker: **none for building, linting, the offline app, Fire
 
 - Successful real-account sign-in/profile rendering with owner-entered credentials; password-reset email delivery; live missing-profile/wrong-role checks with controlled Firebase test users.
 - Firestore data synchronization beyond the single read-only student-profile authorization lookup, Security Rules emulator tests/deployment, Cloud Functions, and server finalization.
-- Teacher Admin Website development beyond the preserved existing prototype.
+- Teacher authentication, role/assignment authorization, and real teacher data beyond the verified local website/backend foundation.
 - Android BLE permissions/scanning/service behavior, ESP32 firmware, RSSI calibration, and real signal-loss tests.
 - Real notifications/alarms; current notification settings and inbox records are offline app data only.
 - Physical-phone UI, accessibility, background/battery, OEM behavior, and installation testing.
@@ -115,4 +132,4 @@ Current environment blocker: **none for building, linting, the offline app, Fire
 
 ## Next major goal
 
-Stop for user review of this authentication milestone. After the owner verifies the existing account/profile login, the approved major delivery order remains: build the **Teacher Admin Website**, then connect both clients through synchronized Firebase records/server logic, followed by ESP32/BLE integration and hardware testing.
+Stop for user review of Teacher Website / backend Milestone 1. Next, register a Firebase Web app in the existing SmartAttend project and implement **teacher Email/Password authentication plus server-side token, role, and assignment authorization**. Only after those negative and positive paths pass should real dashboard reads be connected. Android/teacher synchronization and ESP32/BLE hardware work remain later milestones.
